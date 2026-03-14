@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtualenvs
+.venv/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local datasets / outputs (keep source assets only)
+*.log
+*.tmp
+*.swp
+
+# Large local assets (do not commit)
+scripts/vision/mobileclip_blt.ts
+
+# Local configs / outputs
+config/*.local.yaml
+runs/

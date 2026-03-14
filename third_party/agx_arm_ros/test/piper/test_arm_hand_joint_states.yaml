@@ -1,0 +1,17 @@
+name:
+- joint1
+- joint2
+- joint3
+- joint4
+- joint5
+- joint6
+- l_f_joint1_1
+- l_f_joint1_2
+- l_f_joint2
+- l_f_joint3
+- l_f_joint4
+- l_f_joint5
+position: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100, 100, 100, 100]
+velocity: []
+effort: []
+

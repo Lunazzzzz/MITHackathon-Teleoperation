@@ -1,0 +1,46 @@
+solver:
+  type: placeholder_identity
+  method: none
+
+board:
+  type: placeholder
+  cols: 0
+  rows: 0
+  square_size_mm: 0
+
+camera_intrinsics:
+  camera_matrix:
+    - [1.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0]
+    - [0.0, 0.0, 1.0]
+  dist_coeffs: [0.0, 0.0, 0.0, 0.0, 0.0]
+  rms_reprojection_px: 0.0
+
+transforms:
+  T_base_camera:
+    matrix:
+      - [1.0, 0.0, 0.0, 0.0]
+      - [0.0, 1.0, 0.0, 0.0]
+      - [0.0, 0.0, 1.0, 0.0]
+      - [0.0, 0.0, 0.0, 1.0]
+    pose6: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    translation_m: [0.0, 0.0, 0.0]
+    rotation_rpy_rad: [0.0, 0.0, 0.0]
+  T_gripper_target:
+    matrix:
+      - [1.0, 0.0, 0.0, 0.0]
+      - [0.0, 1.0, 0.0, 0.0]
+      - [0.0, 0.0, 1.0, 0.0]
+      - [0.0, 0.0, 0.0, 1.0]
+    pose6: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    translation_m: [0.0, 0.0, 0.0]
+    rotation_rpy_rad: [0.0, 0.0, 0.0]
+
+metrics:
+  mean_pnp_reprojection_px: 0.0
+  per_sample_pnp_reprojection_px: []
+  sample_count: 0
+
+notes:
+  frame_convention: placeholder only
+  warning: Replace this file with a real calibration result before commanding the robot

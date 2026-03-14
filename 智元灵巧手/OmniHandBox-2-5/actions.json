@@ -1,0 +1,62 @@
+[
+    {
+        "name": "右打开",
+        "pos_axis_1": 4087,
+        "pos_axis_10": 4093,
+        "pos_axis_11": 0,
+        "pos_axis_12": 0,
+        "pos_axis_2": 104,
+        "pos_axis_3": 3976,
+        "pos_axis_4": 1501,
+        "pos_axis_5": 4094,
+        "pos_axis_6": 4094,
+        "pos_axis_7": 1836,
+        "pos_axis_8": 4094,
+        "pos_axis_9": 1589
+    },
+    {
+        "name": "打开",
+        "pos_axis_1": 4000,
+        "pos_axis_10": 4000,
+        "pos_axis_11": 0,
+        "pos_axis_12": 0,
+        "pos_axis_2": 100,
+        "pos_axis_3": 4000,
+        "pos_axis_4": 2000,
+        "pos_axis_5": 4000,
+        "pos_axis_6": 4000,
+        "pos_axis_7": 2000,
+        "pos_axis_8": 4000,
+        "pos_axis_9": 2000
+    },
+    {
+        "name": "握拳",
+        "pos_axis_1": 4000,
+        "pos_axis_10": 100,
+        "pos_axis_11": 0,
+        "pos_axis_12": 0,
+        "pos_axis_2": 4000,
+        "pos_axis_3": 1700,
+        "pos_axis_4": 2000,
+        "pos_axis_5": 100,
+        "pos_axis_6": 100,
+        "pos_axis_7": 2000,
+        "pos_axis_8": 100,
+        "pos_axis_9": 2000
+    },
+    {
+        "name": "零位",
+        "pos_axis_1": 0,
+        "pos_axis_10": 0,
+        "pos_axis_11": 0,
+        "pos_axis_12": 0,
+        "pos_axis_2": 0,
+        "pos_axis_3": 0,
+        "pos_axis_4": 0,
+        "pos_axis_5": 0,
+        "pos_axis_6": 0,
+        "pos_axis_7": 0,
+        "pos_axis_8": 0,
+        "pos_axis_9": 0
+    }
+]

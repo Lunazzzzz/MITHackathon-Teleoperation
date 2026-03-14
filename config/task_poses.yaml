@@ -1,0 +1,50 @@
+task_poses:
+  home:
+    pose:
+    - 0.0
+    - -0.0235
+    - 0.718
+    - 1.3321225515846722
+    - 1.5707788735023767
+    - -0.2386563219177046
+    frame: flange
+    updated_at: '2026-03-13T19:28:58+08:00'
+    channel: can0
+    robot: nero
+  work:
+    pose:
+    - -0.259642
+    - -0.023555
+    - 0.472487
+    - 1.5753167295575619
+    - -1.38205642148423
+    - -0.004276056667386108
+    frame: flange
+    updated_at: '2026-03-13T20:35:15+08:00'
+    channel: can0
+    robot: nero
+  standby:
+    pose:
+    - -0.15115599999999998
+    - -0.32140599999999997
+    - 0.438544
+    - 1.6569632319658567
+    - -1.4455514996717835
+    - 1.1334342695376376
+    frame: flange
+    updated_at: '2026-03-13T20:35:40+08:00'
+    channel: can0
+    robot: nero
+workflow_notes:
+  pick_path:
+  - home
+  - work
+  - target_hover
+  - target_down
+  - grasp
+  place_path:
+  - grasp_retreat
+  - standby
+  - drop_hover
+  - drop_down
+  - release

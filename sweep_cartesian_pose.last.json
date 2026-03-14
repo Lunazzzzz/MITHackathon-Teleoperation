@@ -1,0 +1,105 @@
+{
+  "start_pose_mm_deg": [
+    -419.524,
+    30.476,
+    426.19,
+    54.952,
+    20.0,
+    33.524
+  ],
+  "target_pose_mm_deg": [
+    -410.0,
+    40.0,
+    450.0,
+    44.0,
+    45.0,
+    44.0
+  ],
+  "path_mode": "combined",
+  "steps": [
+    {
+      "step": 1,
+      "stage": "combined",
+      "command_pose_mm_deg": [
+        -418.79138461538463,
+        31.208615384615385,
+        428.02153846153846,
+        54.10953846153846,
+        21.923076923076923,
+        34.329846153846155
+      ],
+      "success": true,
+      "translation_err_mm": 2.1629971125444962,
+      "rotation_err_deg": 1.9080769230769206,
+      "best_translation_err_mm": 2.1629971125444962,
+      "best_rotation_err_deg": 1.9080769230769206,
+      "moved": false,
+      "rotated": false,
+      "last_pose_mm_deg": [
+        -419.531,
+        30.323,
+        426.19199999999995,
+        54.932,
+        20.015,
+        33.554
+      ],
+      "last_status": null
+    },
+    {
+      "step": 2,
+      "stage": "combined",
+      "command_pose_mm_deg": [
+        -418.05876923076926,
+        31.94123076923077,
+        429.85307692307697,
+        53.26707692307693,
+        23.846153846153847,
+        35.13569230769231
+      ],
+      "success": true,
+      "translation_err_mm": 1.9300152143987979,
+      "rotation_err_deg": 1.8901538461538459,
+      "best_translation_err_mm": 1.9300152143987979,
+      "best_rotation_err_deg": 1.8901538461538459,
+      "moved": false,
+      "rotated": false,
+      "last_pose_mm_deg": [
+        -418.668,
+        31.011999999999997,
+        428.275,
+        54.104,
+        21.956,
+        34.356
+      ],
+      "last_status": null
+    },
+    {
+      "step": 3,
+      "stage": "combined",
+      "command_pose_mm_deg": [
+        -417.32615384615383,
+        32.67384615384615,
+        431.68461538461537,
+        52.42461538461538,
+        25.769230769230766,
+        35.941538461538464
+      ],
+      "success": false,
+      "translation_err_mm": 4.281835951825273,
+      "rotation_err_deg": 3.8332307692307674,
+      "best_translation_err_mm": 4.094182961024513,
+      "best_rotation_err_deg": 3.8092307692307665,
+      "moved": false,
+      "rotated": false,
+      "last_pose_mm_deg": [
+        -418.813,
+        31.070999999999998,
+        428.003,
+        54.088,
+        21.936,
+        34.357
+      ],
+      "last_status": "ArmMsgFeedbackStatus:\n  ctrl_mode: CAN_CTRL(0x1)\n  arm_status: NORMAL(0x0)\n  mode_feedback: MOVE_P(0x0)\n  teach_status: DISABLED(0x0)\n  motion_status: REACH_TARGET_POS_FAILED(0x1)\n  trajectory_num: 0\n  err_status:   ErrStatus:\n    joint_1_angle_limit: False\n    joint_2_angle_limit: False\n    joint_3_angle_limit: False\n    joint_4_angle_limit: False\n    joint_5_angle_limit: False\n    joint_6_angle_limit: False\n    joint_7_angle_limit: False\n    communication_status_joint_1: False\n    communication_status_joint_2: False\n    communication_status_joint_3: False\n    communication_status_joint_4: False\n    communication_status_joint_5: False\n    communication_status_joint_6: False\n    communication_status_joint_7: False"
+    }
+  ]
+}

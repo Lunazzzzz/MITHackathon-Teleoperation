@@ -1,0 +1,11 @@
+name:
+- l_f_joint1_1
+- l_f_joint1_2
+- l_f_joint2
+- l_f_joint3
+- l_f_joint4
+- l_f_joint5
+position: [50, 50, 50, 50, 50, 50]
+velocity: []
+effort: []
+

@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: agx_arm_description
+    relative_path: agx_arm_urdf/piper_x/urdf/piper_x_description.urdf
+  srdf:
+    relative_path: config/piper_x_description.srdf
+  package_settings:
+    author_name: agilex
+    author_email: 123456@qq.com
+    generated_timestamp: 1772010126
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity

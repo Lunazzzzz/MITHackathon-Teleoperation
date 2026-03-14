@@ -1,0 +1,22 @@
+{
+  "board_type": "charuco",
+  "board_cols": 11,
+  "board_rows": 8,
+  "square_size_mm": 15.0,
+  "marker_size_mm": 11.0,
+  "aruco_dict": "DICT_4X4_50",
+  "page_width_mm": 297.0,
+  "page_height_mm": 210.0,
+  "dpi": 300,
+  "board_width_mm": 165.0,
+  "board_height_mm": 120.0,
+  "board_width_px": 1949,
+  "board_height_px": 1417,
+  "page_width_px": 3508,
+  "page_height_px": 2480,
+  "board_offset_px": [
+    779,
+    531
+  ],
+  "print_note": "Print at 100% scale with no fit-to-page scaling."
+}

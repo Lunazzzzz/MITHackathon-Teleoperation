@@ -1,0 +1,67 @@
+# Fill this file with the NERO workspace information you have already verified.
+# Position units are millimeters in the robot base frame.
+# Rotation units are degrees in the same x,y,z,rx,ry,rz convention used on the web UI.
+
+robot:
+  model: nero
+  base_frame: base
+  pose_units:
+    position: mm
+    rotation: deg
+
+workspace:
+  hard_limits:
+    x_mm: [null, null]
+    y_mm: [null, null]
+    z_mm: [null, null]
+    note: "Absolute no-go limits. If you know a value is unsafe, write it here even if rough."
+
+  recommended_pick_zone:
+    x_mm: [null, null]
+    y_mm: [null, null]
+    z_mm: [null, null]
+    note: "Preferred zone for vision-guided pick attempts."
+
+  recommended_place_zone:
+    x_mm: [null, null]
+    y_mm: [null, null]
+    z_mm: [null, null]
+    note: "Preferred zone for drop/place motions."
+
+  keepout_boxes:
+    # Add boxes the robot must not enter.
+    # Example:
+    # - name: camera_mount
+    #   x_mm: [-120, 120]
+    #   y_mm: [260, 420]
+    #   z_mm: [500, 900]
+    #   note: "Camera bracket and support"
+    []
+
+poses:
+  home_pose_mm_deg: [null, null, null, null, null, null]
+  ready_pose_mm_deg: [null, null, null, null, null, null]
+
+known_reachable:
+  # Add a few poses that you know are safe and reachable.
+  # Example:
+  # - name: center_high
+  #   pose_mm_deg: [-450, 0, 350, 90, -60, 0]
+  #   note: "Known good CAN move_p pose"
+  []
+
+known_unreachable:
+  # Add a few poses that failed or looked dangerous.
+  []
+
+motion_rules:
+  preferred_speed_percent: 10
+  max_cartesian_step_mm: 20
+  max_rotation_step_deg: 10
+  approach_direction: "downward"
+  descend_only_after_xy_aligned: true
+  note: "Add anything operational that should constrain future motion planning."
+
+camera_alignment:
+  calibration_file: ./data/calib_run_02/calibration_result.yaml
+  visible_pick_zone_note: "Describe the part of the table that is both visible to the camera and reachable by the robot."
