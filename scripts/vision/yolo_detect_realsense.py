@@ -15,8 +15,8 @@ from ultralytics import YOLO
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run YOLO11 on a live RealSense color stream using GPU.")
-    parser.add_argument("--model", default="yolo11s.pt", help="Ultralytics model path or name")
+    parser = argparse.ArgumentParser(description="Run YOLO26 on a live RealSense color stream using GPU.")
+    parser.add_argument("--model", default="yolo26s.pt", help="Ultralytics model path or name")
     parser.add_argument("--device", default="0", help="Inference device. Use 0 for the first CUDA GPU.")
     parser.add_argument("--conf", type=float, default=0.25, help="Confidence threshold")
     parser.add_argument("--camera-serial", default="", help="Optional D435 serial number")

@@ -1,4 +1,4 @@
-model: scripts/vision/yolo11s.pt
+model: yolo26s.pt
 calibration_file: config/calibration.identity.yaml
 
 camera:

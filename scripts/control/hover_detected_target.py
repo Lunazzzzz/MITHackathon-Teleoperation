@@ -5,6 +5,7 @@ import argparse
 import json
 import math
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -110,6 +111,18 @@ def parse_args() -> argparse.Namespace:
         default=30.0,
         help="Maximum command send rate while follow mode is enabled.",
     )
+    parser.add_argument(
+        "--follow-filter-alpha",
+        type=float,
+        default=0.20,
+        help="EMA smoothing factor for the final XYZ command sent to the robot during follow. Lower is smoother.",
+    )
+    parser.add_argument(
+        "--follow-filter-reset-distance-m",
+        type=float,
+        default=0.08,
+        help="Reset follow filtering instead of smoothing when the target command jumps farther than this distance.",
+    )
     parser.add_argument("--go", action="store_true", help="Actually send the hover motion when pressing g")
     parser.add_argument("--save-json", default="", help="Optional JSONL file for detections and hover poses")
     return parser.parse_args()
@@ -182,6 +195,17 @@ def clone_row(row: dict[str, object] | None) -> dict[str, object] | None:
     return cloned
 
 
+def format_target_label(row: dict[str, object] | None) -> str:
+    if row is None:
+        return "unknown"
+    label_text = str(row["class_name"])
+    if row.get("target_name") and row["target_name"] != row["class_name"]:
+        label_text = f"{row['class_name']}->{row['target_name']}"
+    if bool(row.get("stale")):
+        label_text += " stale"
+    return label_text
+
+
 def rpy_to_rot(roll: float, pitch: float, yaw: float) -> np.ndarray:
     cr = math.cos(roll)
     sr = math.sin(roll)
@@ -245,6 +269,126 @@ def send_hover_pose(robot: object, hover_pose: list[float], send_order: str, mod
         raise SystemExit(f"Unknown send_order: {send_order}")
 
 
+def smooth_hover_pose(
+    previous_pose: list[float] | None,
+    target_pose: list[float],
+    alpha: float,
+    reset_distance_m: float,
+) -> list[float]:
+    if previous_pose is None:
+        return [float(v) for v in target_pose]
+    delta_xyz = np.asarray(target_pose[:3], dtype=np.float64) - np.asarray(previous_pose[:3], dtype=np.float64)
+    if float(np.linalg.norm(delta_xyz)) >= max(0.0, reset_distance_m):
+        return [float(v) for v in target_pose]
+    blend = min(1.0, max(0.0, alpha))
+    smoothed = [float(v) for v in target_pose]
+    for idx in range(3):
+        smoothed[idx] = float(previous_pose[idx] + blend * (target_pose[idx] - previous_pose[idx]))
+    return smoothed
+
+
+class FollowController:
+    def __init__(
+        self,
+        robot: object,
+        follow_rate_hz: float,
+        send_order: str,
+        mode_resend: int,
+        filter_alpha: float,
+        filter_reset_distance_m: float,
+    ) -> None:
+        self.robot = robot
+        self.follow_interval_s = 1.0 / max(1e-3, follow_rate_hz)
+        self.send_order = send_order
+        self.mode_resend = mode_resend
+        self.filter_alpha = filter_alpha
+        self.filter_reset_distance_m = filter_reset_distance_m
+        self._lock = threading.Lock()
+        self._stop_event = threading.Event()
+        self._enabled = False
+        self._filter_enabled = False
+        self._hover_pose: list[float] | None = None
+        self._filtered_hover_pose: list[float] | None = None
+        self._label_text = "unknown"
+        self._thread = threading.Thread(target=self._run, name="follow_sender", daemon=True)
+        self._thread.start()
+
+    def set_enabled(self, enabled: bool) -> None:
+        with self._lock:
+            self._enabled = enabled
+            if not enabled:
+                self._filtered_hover_pose = None
+
+    def set_filter_enabled(self, enabled: bool) -> None:
+        with self._lock:
+            self._filter_enabled = enabled
+            self._filtered_hover_pose = None
+
+    def update_target(self, row: dict[str, object] | None, hover_pose: list[float] | None) -> None:
+        with self._lock:
+            self._label_text = format_target_label(row)
+            self._hover_pose = [float(v) for v in hover_pose] if hover_pose is not None else None
+            if hover_pose is None:
+                self._filtered_hover_pose = None
+
+    def stop(self) -> None:
+        self._stop_event.set()
+        self._thread.join(timeout=1.0)
+
+    def _run(self) -> None:
+        last_follow_send_ts = 0.0
+        last_follow_print_ts = 0.0
+        last_skip_print_ts = 0.0
+        while not self._stop_event.is_set():
+            with self._lock:
+                enabled = self._enabled
+                filter_enabled = self._filter_enabled
+                hover_pose = [float(v) for v in self._hover_pose] if self._hover_pose is not None else None
+                filtered_hover_pose = (
+                    [float(v) for v in self._filtered_hover_pose] if self._filtered_hover_pose is not None else None
+                )
+                label_text = self._label_text
+            if not enabled or hover_pose is None:
+                last_follow_send_ts = 0.0
+                self._stop_event.wait(0.005)
+                continue
+            now = time.time()
+            if now - last_follow_send_ts < self.follow_interval_s:
+                self._stop_event.wait(min(0.005, self.follow_interval_s - (now - last_follow_send_ts)))
+                continue
+            try:
+                enabled_states = ensure_robot_enabled(self.robot, timeout_s=0.1)
+                if enabled_states is None or not all(enabled_states):
+                    if now - last_skip_print_ts >= 1.0:
+                        print(f"Follow mode skipped send; joints not enabled: {enabled_states}")
+                        last_skip_print_ts = now
+                    self._stop_event.wait(0.05)
+                    continue
+                if filter_enabled:
+                    filtered_hover_pose = smooth_hover_pose(
+                        filtered_hover_pose,
+                        hover_pose,
+                        self.filter_alpha,
+                        self.filter_reset_distance_m,
+                    )
+                else:
+                    filtered_hover_pose = [float(v) for v in hover_pose]
+                with self._lock:
+                    self._filtered_hover_pose = [float(v) for v in filtered_hover_pose]
+                if check_pose_min_z(filtered_hover_pose, "hover_pose"):
+                    send_hover_pose(self.robot, filtered_hover_pose, self.send_order, self.mode_resend)
+                    last_follow_send_ts = now
+                    if now - last_follow_print_ts >= 1.0:
+                        print(
+                            f"Follow command sent: {label_text} filter={'ON' if filter_enabled else 'OFF'} "
+                            f"raw_hover_pose={hover_pose} filtered_hover_pose={filtered_hover_pose}"
+                        )
+                        last_follow_print_ts = now
+            except Exception as exc:
+                print(f"Follow mode send failed: {exc}")
+                self._stop_event.wait(0.1)
+
+
 def draw_target_box(image: np.ndarray, row: dict[str, object], *, primary: bool) -> None:
     x1, y1, x2, y2 = [int(v) for v in row["bbox_xyxy"]]
     cx, cy = [int(v) for v in row["center_xy"]]
@@ -266,7 +410,9 @@ def overlay_lines(
     debug_rows: list[dict[str, object]],
     *,
     follow_enabled: bool,
+    follow_filter_enabled: bool,
     follow_rate_hz: float,
+    follow_filter_alpha: float,
     base_offset_m: list[float],
     offset_step_m: float,
 ) -> list[str]:
@@ -274,13 +420,14 @@ def overlay_lines(
         "Hover target above detected object",
         f"calibration={calibration_path.name}",
         f"mode={'go' if go else 'dry-run'}",
-        f"follow={'ON' if follow_enabled else 'OFF'} @{follow_rate_hz:.1f}Hz",
+        f"follow={'ON' if follow_enabled else 'OFF'} cmd<={follow_rate_hz:.1f}Hz",
+        f"follow_filter={'ON' if follow_filter_enabled else 'OFF'} alpha={follow_filter_alpha:.2f}",
         f"offset=({base_offset_m[0]:.3f}, {base_offset_m[1]:.3f}, {base_offset_m[2]:.3f}) step={offset_step_m:.3f}m",
     ]
     if row is None or hover_pose is None:
         lines.append("No valid target")
         lines.append("Offset keys: a/d=X-/X+, w/s=Y+/Y-, r/v=Z+/Z-, x=reset")
-        lines.append("Press f to toggle follow, g for single-shot, q to quit")
+        lines.append("Press f=follow, h=filter, g=single-shot, q=quit")
         return lines
     cam = row["camera_xyz_m"]
     base = row["base_xyz_m"]
@@ -300,7 +447,7 @@ def overlay_lines(
         debug_text = ", ".join(f"{r['class_name']}:{float(r['confidence']):.2f}" for r in debug_rows)
         lines.append(f"top={debug_text}")
     lines.append("Offset keys: a/d=X-/X+, w/s=Y+/Y-, r/v=Z+/Z-, x=reset")
-    lines.append("Press f to toggle follow, g for single-shot, q to quit")
+    lines.append("Press f=follow, h=filter, g=single-shot, q=quit")
     return lines
 
 
@@ -331,9 +478,18 @@ def main() -> int:
     output_handle = output_path.open("a", encoding="utf-8") if output_path else None
 
     robot = None
+    follow_controller = None
     if args.go:
         robot = build_robot(args.channel, args.robot)
         prepare_robot(robot, args.speed_percent)
+        follow_controller = FollowController(
+            robot,
+            args.follow_rate_hz,
+            args.send_order,
+            args.mode_resend,
+            args.follow_filter_alpha,
+            args.follow_filter_reset_distance_m,
+        )
 
     window_name = "hover_detected_target"
     last_print_s = 0.0
@@ -342,9 +498,7 @@ def main() -> int:
     last_valid_ts = 0.0
     last_key = -1
     follow_enabled = False
-    last_follow_send_ts = 0.0
-    follow_interval_s = 1.0 / max(1e-3, args.follow_rate_hz)
-    last_follow_print_ts = 0.0
+    follow_filter_enabled = False
 
     try:
         while True:
@@ -408,6 +562,8 @@ def main() -> int:
                 hover_pose = [float(v) for v in last_valid_hover_pose] if last_valid_hover_pose is not None else None
                 if best is not None:
                     best["stale"] = True
+            if follow_controller is not None:
+                follow_controller.update_target(best, hover_pose)
 
             annotated = image.copy()
             if best is not None:
@@ -421,7 +577,9 @@ def main() -> int:
                     args.go,
                     debug_rows,
                     follow_enabled=follow_enabled,
+                    follow_filter_enabled=follow_filter_enabled,
                     follow_rate_hz=args.follow_rate_hz,
+                    follow_filter_alpha=args.follow_filter_alpha,
                     base_offset_m=base_offset_m,
                     offset_step_m=args.offset_step_m,
                 ),
@@ -484,41 +642,25 @@ def main() -> int:
                     [round(base_offset_m[0], 4), round(base_offset_m[1], 4), round(base_offset_m[2], 4)],
                 )
             toggle_follow = key == ord("f") and last_key != ord("f")
+            toggle_filter = key == ord("h") and last_key != ord("h")
             trigger_hover = key == ord("g") and last_key != ord("g")
             last_key = key
             if toggle_follow:
                 follow_enabled = not follow_enabled
                 state = "enabled" if follow_enabled else "disabled"
                 print(f"Follow mode {state} at up to {args.follow_rate_hz:.1f} Hz.")
-                if not follow_enabled:
-                    last_follow_send_ts = 0.0
-
-            if follow_enabled and robot is not None and best is not None and hover_pose is not None:
-                now = time.time()
-                if now - last_follow_send_ts >= follow_interval_s:
-                    enabled_states = ensure_robot_enabled(robot)
-                    if enabled_states is None or not all(enabled_states):
-                        print(f"Follow mode skipped send; joints not enabled: {enabled_states}")
-                    else:
-                        if check_pose_min_z(hover_pose, "hover_pose"):
-                            send_hover_pose(robot, [float(v) for v in hover_pose], args.send_order, args.mode_resend)
-                            last_follow_send_ts = now
-                            if now - last_follow_print_ts >= 1.0:
-                                label_text = str(best["class_name"])
-                                if best.get("target_name") and best["target_name"] != best["class_name"]:
-                                    label_text = f"{best['class_name']}->{best['target_name']}"
-                                if bool(best.get("stale")):
-                                    label_text += " stale"
-                                print(f"Follow command sent: {label_text} hover_pose={[float(v) for v in hover_pose]}")
-                                last_follow_print_ts = now
+                if follow_controller is not None:
+                    follow_controller.set_enabled(follow_enabled)
+            if toggle_filter:
+                follow_filter_enabled = not follow_filter_enabled
+                state = "enabled" if follow_filter_enabled else "disabled"
+                print(f"Follow filter {state} (alpha={args.follow_filter_alpha:.2f}).")
+                if follow_controller is not None:
+                    follow_controller.set_filter_enabled(follow_filter_enabled)
 
             if trigger_hover and best is not None and hover_pose is not None:
                 locked_hover_pose = [float(v) for v in hover_pose]
-                label_text = str(best["class_name"])
-                if best.get("target_name") and best["target_name"] != best["class_name"]:
-                    label_text = f"{best['class_name']}->{best['target_name']}"
-                if bool(best.get("stale")):
-                    label_text += " stale"
+                label_text = format_target_label(best)
                 print(f"Selected target: {label_text} hover_pose={locked_hover_pose}")
                 if robot is not None:
                     if not check_pose_min_z(locked_hover_pose, "hover_pose"):
@@ -550,6 +692,8 @@ def main() -> int:
     finally:
         if output_handle is not None:
             output_handle.close()
+        if follow_controller is not None:
+            follow_controller.stop()
         pipeline.stop()
         cv2.destroyAllWindows()
     return 0

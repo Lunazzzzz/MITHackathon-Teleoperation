@@ -16,7 +16,7 @@ def repo_root() -> Path:
 
 
 def default_model_path() -> Path:
-    return repo_root() / "scripts" / "vision" / "yolo11s.pt"
+    return repo_root() / "yolo26s.pt"
 
 
 def resolve_path(path_str: str) -> Path:

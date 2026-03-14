@@ -10,15 +10,15 @@ from ultralytics import YOLO
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Train a YOLO11 trash detector for bottle/cup classification.")
+    parser = argparse.ArgumentParser(description="Train a YOLO26 trash detector for bottle/cup classification.")
     parser.add_argument("--dataset", required=True, help="Ultralytics dataset YAML path")
-    parser.add_argument("--model", default="yolo11s.pt", help="Starting model weights")
+    parser.add_argument("--model", default="yolo26s.pt", help="Starting model weights")
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--imgsz", type=int, default=640)
     parser.add_argument("--batch", type=int, default=16)
     parser.add_argument("--device", default="0", help="CUDA device id, e.g. 0")
     parser.add_argument("--project", default="runs/detect", help="Training project directory")
-    parser.add_argument("--name", default="trash_yolo11s", help="Training run name")
+    parser.add_argument("--name", default="trash_yolo26s", help="Training run name")
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--patience", type=int, default=20)
     parser.add_argument("--cache", default="ram", choices=["ram", "disk", "False", "false"], help="Ultralytics cache mode")
