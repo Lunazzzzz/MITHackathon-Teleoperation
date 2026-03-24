@@ -1467,6 +1467,50 @@ video {
     gap: 0.9rem;
   }
 
+  body[data-page="home"] .image-slot-grid--3 {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="home"] .image-slot-grid--3 .image-slot {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 7.25rem;
+    grid-template-areas:
+      "badge image"
+      "title image"
+      "text image";
+    align-items: start;
+    column-gap: 0.9rem;
+    row-gap: 0.35rem;
+  }
+
+  body[data-page="home"] .image-slot-grid--3 .image-slot__badge {
+    grid-area: badge;
+    width: max-content;
+    max-width: 100%;
+  }
+
+  body[data-page="home"] .image-slot-grid--3 .image-slot h3 {
+    grid-area: title;
+    margin: 0;
+    align-self: end;
+  }
+
+  body[data-page="home"] .image-slot-grid--3 .image-slot p {
+    grid-area: text;
+    font-size: 0.94rem;
+    line-height: 1.58;
+  }
+
+  body[data-page="home"] .image-slot-grid--3 .image-slot__media {
+    grid-area: image;
+    margin-top: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 7.25rem;
+    aspect-ratio: 1 / 1;
+    align-self: stretch;
+  }
+
   .footer {
     padding: 2.2rem 0 3rem;
   }
