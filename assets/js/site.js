@@ -7,6 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
     toggle.addEventListener("click", () => {
       nav.classList.toggle("is-open");
     });
+
+    nav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        nav.classList.remove("is-open");
+      });
+    });
   }
 
   const current = document.body.dataset.page;
@@ -36,4 +42,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll(".reveal").forEach((node) => observer.observe(node));
 });
-
