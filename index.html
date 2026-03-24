@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intelligent Robotic Sorting | Vision to Action</title>
+  <meta name="description" content="Intelligent Robotic Sorting is a HackMIT robotics project for bottle and cup sorting with YOLO11, RGB-D perception, coordinate transformation, and dexterous robotic grasping.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script defer src="https://unpkg.com/lucide@latest"></script>
+  <script defer src="assets/js/site.js"></script>
+</head>
+<body data-page="home">
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="index.html">
+        <span class="brand__mark">IR</span>
+        <span class="brand__text">Intelligent Robotic Sorting</span>
+      </a>
+      <button class="nav-toggle" data-nav-toggle aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="site-nav" data-nav>
+        <a href="index.html" data-page-link="home">Home</a>
+        <a href="pages/system.html" data-page-link="system">System</a>
+        <a href="pages/build.html" data-page-link="build">Build Journey</a>
+        <a href="pages/demo.html" data-page-link="demo">Demo</a>
+        <a href="pages/team.html" data-page-link="team">Team</a>
+        <a href="https://github.com/Lunazzzzz/MITHackathon-Teleoperation" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <div class="container hero-grid">
+        <div class="reveal">
+          <span class="eyebrow">HackMIT China 2026 Submission</span>
+          <h1 class="hero-title">Intelligent <span class="gradient-text">Robotic Sorting</span>.</h1>
+          <p class="hero-copy">
+            An AI-powered robotic sorting system for bottles and cups. It combines YOLO11 perception, RGB-D depth estimation,
+            coordinate transformation, seek-and-follow arm control, and dexterous grasping into a full pick-move-release prototype.
+          </p>
+          <div class="hero-actions">
+            <a class="button button--primary" href="pages/demo.html">Watch Demo</a>
+            <a class="button button--secondary" href="pages/system.html">Read System</a>
+          </div>
+          <div class="subnav">
+            <a href="assets/docs/project-deck.pdf" target="_blank" rel="noreferrer">Project Deck</a>
+            <a href="assets/docs/hackmit-student-handbook.pdf" target="_blank" rel="noreferrer">Handbook</a>
+          </div>
+        </div>
+        <div class="hero-card reveal">
+          <span class="hero-card__badge"><i data-lucide="scan-search"></i> Intelligent Sorting Core</span>
+          <div class="hero-card__grid">
+            <div class="glass-card">
+              <span class="card-label">System behavior</span>
+              <h3>Detect, follow, grasp, place.</h3>
+              <p class="muted">The system combines perception and manipulation into a focused workflow for bottle and cup sorting.</p>
+            </div>
+            <div class="grid-2">
+              <div class="glass-card">
+                <span class="card-label">Active Sensor</span>
+                <div class="stat-value">RGB-D</div>
+                <div class="stat-label">Intel RealSense D435i</div>
+              </div>
+              <div class="glass-card">
+                <span class="card-label">Manipulator</span>
+                <div class="stat-value">6-DOF</div>
+                <div class="stat-label">Dexterous hand + force tuning</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="reveal">
+          <span class="eyebrow eyebrow--soft">Project snapshots</span>
+          <h2 class="section-title">Real build moments behind the prototype.</h2>
+          <p class="section-intro">These photos show the project as it was actually built: hardware assembly, control development, and close team coordination around the robot.</p>
+        </div>
+        <div class="image-slot-grid image-slot-grid--3" style="margin-top: 1.5rem;">
+          <article class="image-slot image-slot--blue reveal">
+            <span class="image-slot__badge">Hardware Assembly</span>
+            <h3>Installing the dexterous hand</h3>
+            <p>This moment marks the transition from arm-only motion to a system capable of physical grasp execution.</p>
+            <img class="image-slot__media image-slot__media--card image-slot__media--focus-top" src="assets/images/安装灵巧手.jpg" alt="Team members installing the dexterous hand on the robotic arm.">
+          </article>
+          <article class="image-slot image-slot--green reveal">
+            <span class="image-slot__badge">Control Code</span>
+            <h3>Software and control integration</h3>
+            <p>This coding session shows the software side of the project, where perception outputs were turned into robot commands and interface logic.</p>
+            <img class="image-slot__media image-slot__media--card" src="assets/images/编写控制程序.jpg" alt="Team member writing control software for the robotic sorting system.">
+          </article>
+          <article class="image-slot image-slot--purple reveal">
+            <span class="image-slot__badge">Team Workflow</span>
+            <h3>Shared problem-solving</h3>
+            <p>This collaboration snapshot reflects the day-to-day work needed to debug hardware, tune perception, and prepare the final demo.</p>
+            <img class="image-slot__media image-slot__media--card" src="assets/images/同组经验分享.jpg" alt="Team members collaborating beside the robot and laptop during the project.">
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="reveal">
+          <span class="eyebrow eyebrow--soft">Why this matters</span>
+          <h2 class="section-title">The problem is not only seeing waste. It is acting on it safely.</h2>
+          <p class="section-intro">
+            Plastic bottles and cups are everywhere in recycling streams, but separating them still depends on repetitive and often unpleasant human work.
+            Intelligent Robotic Sorting reframes the project around a sharper goal: showing that a compact robot can identify, localize, grasp, and sort common plastic waste credibly.
+          </p>
+        </div>
+        <div class="grid-3" style="margin-top: 1.5rem;">
+          <article class="panel feature-card reveal">
+            <span class="card-label">Messy inputs</span>
+            <h3>Real-world scenes are inconsistent.</h3>
+            <p class="muted">Lighting, clutter, reflective plastic, and object deformation make bottle and cup sorting harder than a clean tabletop vision demo.</p>
+          </article>
+          <article class="panel feature-card reveal">
+            <span class="card-label">Perception gap</span>
+            <h3>Detection is not grasping.</h3>
+            <p class="muted">A bounding box only matters if it becomes a trustworthy 3D target and then a stable robot command in the correct frame.</p>
+          </article>
+          <article class="panel feature-card reveal">
+            <span class="card-label">Safety</span>
+            <h3>Motion must be engineered, not improvised.</h3>
+            <p class="muted">Grasp force, hand synchronization, and motion safety have to be tuned with restraint or the whole pipeline becomes fragile fast.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="reveal" style="text-align: center;">
+          <span class="eyebrow">Core loop</span>
+          <h2 class="section-title">SEE. UNDERSTAND. LOCATE. ACT.</h2>
+          <p class="section-intro">The robotic loop moves from RGB-D sensing to detection, localization, and physical sorting.</p>
+        </div>
+        <div class="grid-4 loop-band" style="margin-top: 1.7rem;">
+          <article class="panel loop-card reveal">
+            <div class="loop-card__accent blue"><i data-lucide="eye"></i></div>
+            <span class="card-label">SEE</span>
+            <h3>Capture the scene.</h3>
+            <p class="muted">Capture RGB-D visual data from the D435i so the robot has both appearance and depth cues before it moves.</p>
+            <div class="mini-screen">
+              <div class="mini-screen__bar"><span></span><span></span><span></span></div>
+              <div class="mini-screen__caption">Input: RGB-D stream</div>
+            </div>
+          </article>
+          <article class="panel loop-card reveal">
+            <div class="loop-card__accent green"><i data-lucide="brain-circuit"></i></div>
+            <span class="card-label">UNDERSTAND</span>
+            <h3>Detect and classify.</h3>
+            <p class="muted">Use an improved YOLO11 model to identify bottles and cups with real-time labels and candidate grasp targets.</p>
+            <div class="mini-screen">
+              <div class="mini-screen__bar"><span></span><span></span><span></span></div>
+              <div class="mini-screen__caption">Output: class + bbox</div>
+            </div>
+          </article>
+          <article class="panel loop-card reveal">
+            <div class="loop-card__accent purple"><i data-lucide="crosshair"></i></div>
+            <span class="card-label">LOCATE</span>
+            <h3>Transform coordinates.</h3>
+            <p class="muted">Convert visual detections into physical robot coordinates so the arm can align itself above the object reliably.</p>
+            <div class="mini-screen">
+              <div class="mini-screen__bar"><span></span><span></span><span></span></div>
+              <div class="mini-screen__caption">Output: camera/base XYZ</div>
+            </div>
+          </article>
+          <article class="panel loop-card reveal">
+            <div class="loop-card__accent orange"><i data-lucide="bot"></i></div>
+            <span class="card-label">ACT</span>
+            <h3>Execute safe motion.</h3>
+            <p class="muted">Run seek-and-follow movement, adapt hand approach, then complete a categorized pick-move-release cycle.</p>
+            <div class="mini-screen">
+              <div class="mini-screen__bar"><span></span><span></span><span></span></div>
+              <div class="mini-screen__caption">Output: safe robot command</div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--dark">
+      <div class="container">
+        <div class="reveal">
+          <span class="eyebrow">What we built</span>
+          <h2 class="section-title">An integrated system for perception, localization, and robotic sorting.</h2>
+          <p class="section-intro">The prototype combines real-time detection, coordinate transformation, arm alignment, and dexterous pick-and-place behavior into one coherent system.</p>
+        </div>
+        <div class="grid-4" style="margin-top: 1.6rem;">
+          <article class="glass-card stat-card reveal">
+            <span class="stat-label">Vision</span>
+            <div class="stat-value">RGB-D</div>
+            <h3>Real-time bottle and cup detection</h3>
+            <p class="muted">RealSense capture and improved YOLO11 inference give the system live object identity and position cues.</p>
+          </article>
+          <article class="glass-card stat-card reveal">
+            <span class="stat-label">Calibration</span>
+            <div class="stat-value">XYZ</div>
+            <h3>Coordinate transformation</h3>
+            <p class="muted">2D pixels become 3D robot-space targets, which is the bridge between computer vision and physical action.</p>
+          </article>
+          <article class="glass-card stat-card reveal">
+            <span class="stat-label">Control</span>
+            <div class="stat-value">Safe</div>
+            <h3>Seek-and-follow arm control</h3>
+            <p class="muted">The arm tracks target position continuously and keeps an intended offset while object height changes.</p>
+          </article>
+          <article class="glass-card stat-card reveal">
+            <span class="stat-label">Interface</span>
+            <div class="stat-value">Web</div>
+            <h3>Dexterous grasp and placement</h3>
+            <p class="muted">A dexterous hand with force-aware control grips the object and places it into the proper category bin.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="reveal">
+          <span class="eyebrow eyebrow--soft">System overview</span>
+          <h2 class="section-title">System architecture at a glance.</h2>
+          <p class="section-intro">From sensor input to robot action, each layer contributes to the full sorting pipeline.</p>
+        </div>
+        <div class="panel architecture-flow reveal" style="margin-top: 1.6rem;">
+          <div class="architecture-row">
+            <div class="architecture-node glass-card"><span class="card-label">Sensor</span><h3>RealSense</h3><p class="muted">RGB-D acquisition</p></div>
+            <div class="architecture-node glass-card"><span class="card-label">Vision</span><h3>YOLO</h3><p class="muted">Detection + labels</p></div>
+            <div class="architecture-node glass-card"><span class="card-label">Depth</span><h3>XYZ</h3><p class="muted">3D point extraction</p></div>
+            <div class="architecture-node glass-card"><span class="card-label">Calibration</span><h3>T base-camera</h3><p class="muted">Coordinate transform</p></div>
+            <div class="architecture-node glass-card"><span class="card-label">Motion</span><h3>Planner</h3><p class="muted">Safe task commands</p></div>
+            <div class="architecture-node glass-card"><span class="card-label">Interface</span><h3>Web console</h3><p class="muted">Status + control</p></div>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <a class="button button--secondary" href="pages/system.html">Open Full System Page</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container grid-2">
+        <div class="reveal">
+          <span class="eyebrow">Build journey</span>
+          <h2 class="section-title">How the prototype was built and validated.</h2>
+          <p class="section-intro">The build progressed from sensor bring-up to calibration, grasp tuning, and demo integration.</p>
+          <div class="hero-actions">
+            <a class="button button--secondary" href="pages/build.html">Read Build Journey</a>
+          </div>
+        </div>
+        <div class="timeline reveal">
+          <article class="panel timeline-item">
+            <span class="card-label">Phase 01</span>
+            <h3>Camera and model bring-up</h3>
+            <p>Stream live RGB-D data and confirm that YOLO11 can detect bottles and cups consistently in the real workspace.</p>
+          </article>
+          <article class="panel timeline-item">
+            <span class="card-label">Phase 02</span>
+            <h3>Coordinate transformation and targeting</h3>
+            <p>Translate visual coordinates into robot-space targets and make sure the arm can move above the detected object accurately.</p>
+          </article>
+          <article class="panel timeline-item">
+            <span class="card-label">Phase 03</span>
+            <h3>Hardware synchronization and grasp tuning</h3>
+            <p>Integrate the dexterous hand, calibrate force, and reduce grasp failures caused by depth noise or object deformation.</p>
+          </article>
+          <article class="panel timeline-item">
+            <span class="card-label">Phase 04</span>
+            <h3>Website and operator presentation layer</h3>
+            <p>Turn the full stack into something legible for judges by exposing the system story, outputs, and demo flow clearly.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--dark">
+      <div class="container grid-2">
+        <div class="media-panel reveal">
+          <span class="card-label">Demo preview</span>
+          <h2 class="section-title" style="margin-top: 0.45rem;">Robot Demo Preview</h2>
+          <p class="section-intro">Featured footage from the prototype shows target detection, arm following, dexterous grasping, and categorized placement.</p>
+          <div class="hero-actions">
+            <a class="button button--primary" href="pages/demo.html">Open Demo Page</a>
+          </div>
+        </div>
+        <div class="media-frame reveal">
+          <div class="scanner-line"></div>
+          <video controls muted loop playsinline poster="assets/images/derived/demo-bottle-run.jpg">
+            <source src="assets/videos/derived/bottle-run-silent.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="reveal">
+          <span class="eyebrow eyebrow--soft">Engineering decisions</span>
+          <h2 class="section-title">Three choices that define the project tone.</h2>
+        </div>
+        <div class="decision-grid" style="margin-top: 1.6rem;">
+          <article class="panel decision-card reveal">
+            <span class="card-label">Decision 01</span>
+            <h3>Validate before scaling</h3>
+            <p class="muted">Staged validation matters because safe iteration is one of the strongest signs of serious robotics engineering.</p>
+          </article>
+          <article class="panel decision-card reveal">
+            <span class="card-label">Decision 02</span>
+            <h3>Fixed camera calibration first</h3>
+            <p class="muted">Coordinate transformation is essential because accurate robot motion depends on stable alignment between camera and arm.</p>
+          </article>
+          <article class="panel decision-card reveal">
+            <span class="card-label">Decision 03</span>
+            <h3>Web interface as a demo layer</h3>
+            <p class="muted">The website presents system behavior, technical context, and demo evidence for judges and collaborators.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container grid-2">
+        <div class="reveal">
+          <span class="eyebrow">Safety and constraints</span>
+          <h2 class="section-title">Safety is a visible feature, not a footnote.</h2>
+          <p class="section-intro">Safety is built into the prototype through workspace limits, motion constraints, and supervised operation.</p>
+        </div>
+        <div class="grid-2 reveal">
+          <article class="panel">
+            <span class="card-label">Motion</span>
+            <h3>Z-axis limit</h3>
+            <p class="muted">Approach limits help the arm stay above the object until localization and following have stabilized.</p>
+          </article>
+          <article class="panel">
+            <span class="card-label">Workspace</span>
+            <h3>Constrained operating region</h3>
+            <p class="muted">Known-safe regions and designated bins stop visually plausible but physically unsafe commands from becoming live motion.</p>
+          </article>
+          <article class="panel">
+            <span class="card-label">Operation</span>
+            <h3>Human-supervised runs</h3>
+            <p class="muted">Human supervision remains part of the loop because grasp force, connectivity, and hardware timing still matter in live demos.</p>
+          </article>
+          <article class="panel">
+            <span class="card-label">Roadmap discipline</span>
+            <h3>Incremental validation</h3>
+            <p class="muted">The project reads better when validated work and planned upgrades are separated explicitly instead of blended together.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--dark">
+      <div class="container grid-2">
+        <div class="reveal">
+          <span class="eyebrow">Next steps</span>
+          <h2 class="section-title">What comes after the first public demo.</h2>
+        </div>
+        <div class="grid-2 reveal">
+          <article class="glass-card">
+            <span class="card-label">Roadmap</span>
+            <h3>Real grasp integration</h3>
+            <p class="muted">Keep improving grasp reliability and repeatability as the hardware and control policy stabilize.</p>
+          </article>
+          <article class="glass-card">
+            <span class="card-label">Roadmap</span>
+            <h3>Better grasp pose estimation</h3>
+            <p class="muted">Push beyond simple center-point targeting toward richer geometry and more precise approach planning.</p>
+          </article>
+          <article class="glass-card">
+            <span class="card-label">Roadmap</span>
+            <h3>More recyclable classes</h3>
+            <p class="muted">Expand beyond bottles and cups to cans, cartons, and additional recyclable waste categories.</p>
+          </article>
+          <article class="glass-card">
+            <span class="card-label">Roadmap</span>
+            <h3>Continuous closed-loop sorting</h3>
+            <p class="muted">Keep moving toward edge-device deployment, longer autonomous cycles, and broader physical intelligence capabilities.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="reveal">
+          <span class="eyebrow eyebrow--soft">Team</span>
+          <h2 class="section-title">The people behind the integration work.</h2>
+        </div>
+        <div class="team-grid" style="margin-top: 1.6rem;">
+          <article class="panel team-card person-card person-card--blue reveal">
+            <span class="team-role">Systems Integration</span>
+            <h3 class="person-name">Luna Zhang</h3>
+            <p class="person-title">Documentation, interface integration, and communication reliability</p>
+            <ul class="person-list">
+              <li>Managed documentation and presentation materials for the hackathon submission.</li>
+              <li>Coordinated workflow across the project.</li>
+              <li>Handled the software-hardware interface and resolved robot communication bugs.</li>
+            </ul>
+          </article>
+          <article class="panel team-card person-card person-card--green reveal">
+            <span class="team-role">Vision and Manipulation</span>
+            <h3 class="person-name">Tang Fuqing</h3>
+            <p class="person-title">Model integration, robot coordinates, and arm-hand integration</p>
+            <ul class="person-list">
+              <li>Integrated YOLO11 into the live perception pipeline.</li>
+              <li>Built the coordinate transformation chain from pixels to robot-space positioning.</li>
+              <li>Programmed the robotic arm and managed integration with the dexterous hand.</li>
+            </ul>
+          </article>
+          <article class="panel team-card reveal">
+            <span class="team-role">Advisors</span>
+            <h3>Zhen Fan and Yi Shao</h3>
+            <p class="muted">Guiding instructors who supported the project direction, system thinking, and technical development during the build.</p>
+          </article>
+        </div>
+        <div class="hero-actions">
+          <a class="button button--secondary" href="pages/team.html">Open Team Page</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="brand">
+          <span class="brand__mark">IR</span>
+          <span class="brand__text">Intelligent Robotic Sorting</span>
+        </div>
+        <p class="footer-meta">HackMIT project website for Intelligent Robotic Sorting.</p>
+        <p class="footer-meta">&copy; <span data-year></span> Intelligent Robotic Sorting Project.</p>
+      </div>
+      <div class="footer-links">
+        <a class="footer-link" href="assets/docs/project-deck.pdf" target="_blank" rel="noreferrer">Deck</a>
+        <a class="footer-link" href="pages/demo.html">Demo</a>
+        <a class="footer-link" href="pages/system.html">System</a>
+        <a class="footer-link" href="https://github.com/Lunazzzzz/MITHackathon-Teleoperation" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      if (window.lucide) window.lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

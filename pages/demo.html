@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intelligent Robotic Sorting | Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <script defer src="https://unpkg.com/lucide@latest"></script>
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body data-page="demo">
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="../index.html">
+        <span class="brand__mark">IR</span>
+        <span class="brand__text">Intelligent Robotic Sorting</span>
+      </a>
+      <button class="nav-toggle" data-nav-toggle aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" data-nav>
+        <a href="../index.html" data-page-link="home">Home</a>
+        <a href="system.html" data-page-link="system">System</a>
+        <a href="build.html" data-page-link="build">Build Journey</a>
+        <a href="demo.html" data-page-link="demo">Demo</a>
+        <a href="team.html" data-page-link="team">Team</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="sub-hero">
+      <div class="container">
+        <span class="eyebrow">Demo and evidence</span>
+        <h1 class="section-title">From Detection to Physical Sorting.</h1>
+        <p class="lead">This demo shows the robot performing detection, target following, grasping, and categorized placement.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="video-embed demo-feature-video reveal">
+          <video controls muted loop playsinline poster="../assets/images/derived/demo-bottle-run.jpg">
+            <source src="../assets/videos/derived/bottle-run-silent.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="grid-2 grid-2--top" style="margin-top: 1.5rem;">
+        <div class="panel reveal">
+          <span class="card-label">Featured workflows</span>
+          <h3>Bottle and cup sorting runs</h3>
+          <p class="muted">These videos capture live detection, arm alignment, dexterous grasping, and final release into the correct category.</p>
+          <div class="video-embed" style="margin-top: 1rem;">
+            <video controls muted loop playsinline poster="../assets/images/derived/demo-cup-run.jpg">
+              <source src="../assets/videos/derived/cup-run-silent.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="grid-2" style="margin-top: 1rem;">
+            <div class="glass-card"><span class="card-label">Validation</span><h3>Two object classes</h3><p class="muted">Both bottles and cups appear in the full workflow videos, matching the current scope of the prototype.</p></div>
+            <div class="glass-card"><span class="card-label">Validation</span><h3>Depth-backed localization</h3><p class="muted">The arm moves against measured 3D target positions rather than only 2D image-space detections.</p></div>
+            <div class="glass-card"><span class="card-label">Validation</span><h3>Continuous arm alignment</h3><p class="muted">The follow stage keeps the end effector positioned over the target before grasp execution begins.</p></div>
+            <div class="glass-card"><span class="card-label">Outcome</span><h3>Physical grasp and release</h3><p class="muted">The manipulation sequence closes with a grip, transfer, and categorized placement.</p></div>
+          </div>
+        </div>
+        <div class="panel reveal">
+          <span class="card-label">Run summary</span>
+          <h3>What the featured run shows</h3>
+          <p class="muted">The main demo now stands on its own in a full-width column so the motion reads cleanly: detect the object, align the arm, grasp with the dexterous hand, then release into the target category.</p>
+          <div class="grid-2" style="margin-top: 1rem;">
+            <div class="glass-card"><span class="card-label">Primary object</span><h3>Bottle workflow</h3><p class="muted">The featured clip shows the bottle sequence end to end, from recognition to placement.</p></div>
+            <div class="glass-card"><span class="card-label">Secondary object</span><h3>Cup workflow</h3><p class="muted">The second clip confirms the same control pipeline can generalize across the two supported classes.</p></div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="reveal">
+          <span class="eyebrow eyebrow--soft">Supporting media</span>
+          <h2 class="section-title">Additional views of the system in motion.</h2>
+          <p class="section-intro">Supporting clips and stills highlight the follow stage, the detection interface, hardware integration, and the physical setup around the robot.</p>
+        </div>
+        <div class="image-slot-grid image-slot-grid--2" style="margin-top: 1.5rem;">
+          <article class="image-slot image-slot--blue reveal">
+            <span class="image-slot__badge">Seek and Follow</span>
+            <h3>End-effector tracking before grasp</h3>
+            <p>This clip isolates the tracking behavior and makes the arm-control stage easier to review.</p>
+            <div class="video-embed" style="margin-top: 1rem;">
+              <video controls muted loop playsinline poster="../assets/images/derived/demo-follow-frame.jpg">
+                <source src="../assets/videos/derived/follow-silent.mp4" type="video/mp4">
+              </video>
+            </div>
+          </article>
+          <article class="image-slot image-slot--green reveal">
+            <span class="image-slot__badge">Detection</span>
+            <h3>Annotated localization output</h3>
+            <p>This clip shows the visual front end directly, including labels, overlays, and the target used for robot alignment.</p>
+            <div class="video-embed" style="margin-top: 1rem;">
+              <video controls muted loop playsinline poster="../assets/images/derived/demo-detection-frame.jpg">
+                <source src="../assets/videos/derived/detection-silent.mp4" type="video/mp4">
+              </video>
+            </div>
+          </article>
+          <article class="image-slot image-slot--purple reveal">
+            <span class="image-slot__badge">Hand Setup</span>
+            <h3>Dexterous hand installation</h3>
+            <p>This hardware snapshot shows the integration work behind the grasp sequence seen in the main videos.</p>
+            <img class="image-slot__media image-slot__media--card image-slot__media--focus-mid" src="../assets/images/安装灵巧手.jpg" alt="Team members installing and adjusting the dexterous hand on the robot arm.">
+          </article>
+          <article class="image-slot image-slot--orange reveal">
+            <span class="image-slot__badge">Workspace</span>
+            <h3>Calibration and robot setup</h3>
+            <p>This workspace image ties the demo results back to the calibrated setup that makes physical targeting possible.</p>
+            <img class="image-slot__media image-slot__media--card image-slot__media--focus-mid" src="../assets/images/使用标定版标定新.png" alt="Team member calibrating the robot workspace with the calibration board.">
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--dark">
+      <div class="container evidence-grid">
+        <article class="evidence-card evidence-card--blue reveal">
+          <span class="stat-label">Evidence</span>
+          <div class="stat-value">1x</div>
+          <h3>Featured robot run</h3>
+          <p class="muted">A featured run captures the full detect-follow-grasp-place cycle in a single sequence.</p>
+        </article>
+        <article class="evidence-card evidence-card--purple reveal">
+          <span class="stat-label">Evidence</span>
+          <div class="stat-value">3x</div>
+          <h3>Annotated system frames</h3>
+          <p class="muted">Annotated frames separate perception, localization, and manipulation evidence for clear review.</p>
+        </article>
+        <article class="evidence-card evidence-card--green reveal">
+          <span class="stat-label">Evidence</span>
+          <div class="stat-value">1x</div>
+          <h3>Prototype outcomes</h3>
+          <p class="muted">Summarize what is already validated now: bottle/cup recognition, coordinate alignment, dynamic following, and categorized placement.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container grid-2">
+        <article class="panel reveal">
+          <span class="card-label">Downloads</span>
+          <h3>Support material</h3>
+          <p class="muted">The project deck and supporting documents provide additional technical background for the prototype.</p>
+          <div class="hero-actions">
+            <a class="button button--secondary" href="../assets/docs/project-deck.pdf" target="_blank" rel="noreferrer">Open Deck</a>
+            <a class="button button--secondary" href="../assets/docs/hackmit-student-handbook.pdf" target="_blank" rel="noreferrer">Open Handbook</a>
+          </div>
+        </article>
+        <article class="panel reveal">
+          <span class="card-label">Repository</span>
+          <h3>Technical source of truth</h3>
+          <p class="muted">The repository contains the implementation details behind the demo pipeline.</p>
+          <div class="hero-actions">
+            <a class="button button--primary" href="https://github.com/Lunazzzzz/MITHackathon-Teleoperation" target="_blank" rel="noreferrer">View GitHub Repo</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="brand"><span class="brand__mark">IR</span><span class="brand__text">Intelligent Robotic Sorting</span></div>
+        <p class="footer-meta">Live videos, system frames, and outcome summaries from the prototype.</p>
+      </div>
+      <div class="footer-links">
+        <a class="footer-link" href="../index.html">Home</a>
+        <a class="footer-link" href="build.html">Build</a>
+        <a class="footer-link" href="../assets/docs/project-deck.pdf" target="_blank" rel="noreferrer">Deck</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      if (window.lucide) window.lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

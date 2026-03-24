@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intelligent Robotic Sorting | System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <script defer src="https://unpkg.com/lucide@latest"></script>
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body data-page="system">
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="../index.html">
+        <span class="brand__mark">IR</span>
+        <span class="brand__text">Intelligent Robotic Sorting</span>
+      </a>
+      <button class="nav-toggle" data-nav-toggle aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" data-nav>
+        <a href="../index.html" data-page-link="home">Home</a>
+        <a href="system.html" data-page-link="system">System</a>
+        <a href="build.html" data-page-link="build">Build Journey</a>
+        <a href="demo.html" data-page-link="demo">Demo</a>
+        <a href="team.html" data-page-link="team">Team</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="sub-hero">
+      <div class="container">
+        <span class="eyebrow">System architecture</span>
+        <h1 class="section-title">From perception to robotic execution.</h1>
+        <p class="lead">The system links YOLO11 perception, RGB-D localization, coordinate transformation, and robot control into one sorting pipeline.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="grid-2">
+          <article class="panel reveal">
+            <span class="card-label">Sensor layer</span>
+            <h3>RealSense D435i input*</h3>
+            <p class="muted">RGB and depth streams define the base observation layer for bottle and cup sorting in real time.</p>
+            <img class="image-slot__media image-slot__media--card image-slot__media--contain" src="../assets/images/externals/system-sensor-d435.jpg" alt="Intel RealSense D435 depth camera on a tripod.">
+            <p class="external-credit">* External reference image. Source: <a href="https://commons.wikimedia.org/wiki/File:Intel_Realsense_depth_camera_D435.jpg" target="_blank" rel="noreferrer">Marc Auledas, CC BY-SA 4.0</a>.</p>
+          </article>
+          <article class="panel reveal">
+            <span class="card-label">Perception layer</span>
+            <h3>Improved YOLO11 detection*</h3>
+            <p class="muted">Model inference produces bottle and cup labels plus 2D boxes before the system estimates physical target position.</p>
+            <img class="image-slot__media image-slot__media--card" src="../assets/images/externals/system-perception-object-detection.png" alt="Object detection example with labeled bounding boxes.">
+            <p class="external-credit">* External reference image. Source: <a href="https://commons.wikimedia.org/wiki/File:ObjectDetectionExample.png" target="_blank" rel="noreferrer">Hughesperreault, CC BY-SA 4.0</a>.</p>
+          </article>
+          <article class="panel reveal">
+            <span class="card-label">Calibration layer</span>
+            <h3>Coordinate transformation*</h3>
+            <p class="muted">Depth-aware visual data is translated into robot coordinates so the manipulator can act on detections physically.</p>
+            <img class="image-slot__media image-slot__media--card image-slot__media--contain" src="../assets/images/externals/system-calibration-chessboard.png" alt="Chessboard calibration setup illustration.">
+            <p class="external-credit">* External reference image. Source: <a href="https://commons.wikimedia.org/wiki/File:Chessboard_calibration_setup.png" target="_blank" rel="noreferrer">Ibai Gorordo, CC BY-SA 4.0</a>.</p>
+          </article>
+          <article class="panel reveal">
+            <span class="card-label">Action layer</span>
+            <h3>Seek-and-follow + grasp execution*</h3>
+            <p class="muted">The arm aligns above the target, adapts to height changes, and then executes categorized grasp-and-place behavior.</p>
+            <img class="image-slot__media image-slot__media--card" src="../assets/images/externals/system-action-grasping.jpg" alt="Service robot grasping an object on a table.">
+            <p class="external-credit">* External reference image. Source: <a href="https://commons.wikimedia.org/wiki/File:Care-O-Bot_grasping_an_object_on_the_table_(5117071459).jpg" target="_blank" rel="noreferrer">Paul Beaudry, CC BY-SA 2.0</a>.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="reveal">
+          <span class="eyebrow eyebrow--soft">System visuals</span>
+          <h2 class="section-title">Calibration and perception evidence.</h2>
+          <p class="section-intro">These visuals show the calibration setup and live perception outputs used during robot operation.</p>
+        </div>
+        <div class="image-slot-grid image-slot-grid--2" style="margin-top: 1.5rem;">
+          <article class="image-slot image-slot--cyan reveal">
+            <span class="image-slot__badge">Calibration</span>
+            <h3>Using the calibration board</h3>
+            <p>This calibration procedure establishes the relationship between camera observations and robot coordinates.</p>
+            <img class="image-slot__media image-slot__media--card image-slot__media--focus-mid" src="../assets/images/使用标定版标定新.png" alt="Team member using the calibration board with the robot and camera for coordinate alignment.">
+          </article>
+          <article class="image-slot image-slot--orange reveal">
+            <span class="image-slot__badge">Setup</span>
+            <h3>Calibration board installation</h3>
+            <p>This setup image documents the physical preparation needed before coordinate transformation and end-to-end motion could be trusted.</p>
+            <img class="image-slot__media image-slot__media--card image-slot__media--focus-low" src="../assets/images/标定版安装.jpg" alt="Team members positioning the calibration board in the robot workspace.">
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container grid-2">
+        <article class="panel reveal">
+          <span class="card-label">Control evidence</span>
+          <h3>Seek-and-follow arm motion</h3>
+          <p class="muted">This clip isolates the alignment stage, showing how the arm maintains a controlled relationship to the target before grasp execution.</p>
+          <div class="video-embed" style="margin-top: 1rem;">
+            <video controls muted loop playsinline poster="../assets/images/derived/demo-follow-frame.jpg">
+              <source src="../assets/videos/derived/follow-silent.mp4" type="video/mp4">
+            </video>
+          </div>
+        </article>
+        <article class="panel reveal">
+          <span class="card-label">Perception evidence</span>
+          <h3>Live detection and localization</h3>
+          <p class="muted">This detection clip shows the perception output directly, including object labels and the targeting information used by the rest of the pipeline.</p>
+          <div class="video-embed" style="margin-top: 1rem;">
+            <video controls muted loop playsinline poster="../assets/images/derived/demo-detection-frame.jpg">
+              <source src="../assets/videos/derived/detection-silent.mp4" type="video/mp4">
+            </video>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section section--dark">
+      <div class="container">
+        <div class="reveal">
+          <span class="eyebrow">Data flow</span>
+          <h2 class="section-title">The core technical chain.</h2>
+        </div>
+        <div class="flow-shell reveal">
+          <div class="flow-grid">
+            <article class="flow-node flow-node--blue">
+              <span class="flow-node__step">1</span>
+              <h3>RGB-D stream</h3>
+              <p>Sensor frames arrive from the D435i and establish the live scene.</p>
+              <div class="flow-node__meta">Input: color + depth</div>
+            </article>
+            <article class="flow-node flow-node--green">
+              <span class="flow-node__step">2</span>
+              <h3>YOLO11 detection</h3>
+              <p>Bottle and cup targets are classified with live bounding boxes.</p>
+              <div class="flow-node__meta">Output: class + bbox</div>
+            </article>
+            <article class="flow-node flow-node--purple">
+              <span class="flow-node__step">3</span>
+              <h3>Depth query</h3>
+              <p>Depth is sampled around the target to estimate camera-space XYZ.</p>
+              <div class="flow-node__meta">Output: camera XYZ</div>
+            </article>
+            <article class="flow-node flow-node--orange">
+              <span class="flow-node__step">4</span>
+              <h3>Coordinate transform</h3>
+              <p>Visual coordinates are converted into actionable robot-space targets.</p>
+              <div class="flow-node__meta">Output: robot target</div>
+            </article>
+            <article class="flow-node flow-node--pink">
+              <span class="flow-node__step">5</span>
+              <h3>Seek and follow</h3>
+              <p>The arm tracks the object and maintains a proper approach distance.</p>
+              <div class="flow-node__meta">Action: align + approach</div>
+            </article>
+            <article class="flow-node flow-node--cyan">
+              <span class="flow-node__step">6</span>
+              <h3>Grasp and place</h3>
+              <p>The dexterous hand grips with tuned force and releases into the correct bin.</p>
+              <div class="flow-node__meta">Feedback: logs + operator view</div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container grid-3">
+        <article class="panel reveal">
+          <span class="card-label">Interface boundary</span>
+          <h3>Operator visibility and runtime feedback</h3>
+          <p class="muted">The web layer helps operators and judges understand what the robot is seeing, tracking, and doing during the run.</p>
+        </article>
+        <article class="panel reveal">
+          <span class="card-label">Validation boundary</span>
+          <h3>Subsystem validation before full runs</h3>
+          <p class="muted">Each subsystem was validated separately before end-to-end runs, including detection, localization, calibration, and manipulator motion.</p>
+        </article>
+        <article class="panel reveal">
+          <span class="card-label">Expansion boundary</span>
+          <h3>Prototype first, deployment later</h3>
+          <p class="muted">Current results focus on prototype validation, while broader deployment, additional categories, and longer autonomous runs remain future work.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="brand"><span class="brand__mark">IR</span><span class="brand__text">Intelligent Robotic Sorting</span></div>
+        <p class="footer-meta">Architecture, data flow, and control logic behind the prototype.</p>
+      </div>
+      <div class="footer-links">
+        <a class="footer-link" href="../index.html">Home</a>
+        <a class="footer-link" href="demo.html">Demo</a>
+        <a class="footer-link" href="../assets/docs/project-deck.pdf" target="_blank" rel="noreferrer">Deck</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      if (window.lucide) window.lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

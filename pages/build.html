@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intelligent Robotic Sorting | Build Journey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <script defer src="https://unpkg.com/lucide@latest"></script>
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body data-page="build">
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="../index.html">
+        <span class="brand__mark">IR</span>
+        <span class="brand__text">Intelligent Robotic Sorting</span>
+      </a>
+      <button class="nav-toggle" data-nav-toggle aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" data-nav>
+        <a href="../index.html" data-page-link="home">Home</a>
+        <a href="system.html" data-page-link="system">System</a>
+        <a href="build.html" data-page-link="build">Build Journey</a>
+        <a href="demo.html" data-page-link="demo">Demo</a>
+        <a href="team.html" data-page-link="team">Team</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="sub-hero">
+      <div class="container">
+        <span class="eyebrow">Build journey</span>
+        <h1 class="section-title">How the prototype came together.</h1>
+        <p class="lead">The build moved through environment setup, perception validation, calibration, grasp tuning, and demo integration.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container timeline">
+        <article class="panel timeline-item reveal">
+          <span class="card-label">Phase 01</span>
+          <h3>Environment and dependency validation</h3>
+          <p class="muted">Start with reproducibility: environment setup, model loading, camera access, and self-test scripts before moving hardware.</p>
+        </article>
+        <article class="panel timeline-item reveal">
+          <span class="card-label">Phase 02</span>
+          <h3>Pure vision verification</h3>
+          <p class="muted">Validate 2D detection quality and object categories before depth and calibration are expected to carry the whole stack.</p>
+        </article>
+        <article class="panel timeline-item reveal">
+          <span class="card-label">Phase 03</span>
+          <h3>Coordinate alignment</h3>
+          <p class="muted">Use calibration to make camera output actionable. Without this step, robot motion is disconnected from perception.</p>
+        </article>
+        <article class="panel timeline-item reveal">
+          <span class="card-label">Phase 04</span>
+          <h3>Staged grasp validation</h3>
+          <p class="muted">The key engineering decision was to validate alignment, motion policy, and hardware timing incrementally before claiming robust physical sorting.</p>
+        </article>
+        <article class="panel timeline-item reveal">
+          <span class="card-label">Phase 05</span>
+          <h3>Web-facing demo layer</h3>
+          <p class="muted">The operator console and project website become communication layers for judges, teammates, and future contributors.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="reveal">
+          <span class="eyebrow eyebrow--soft">Build snapshots</span>
+          <h2 class="section-title">What the work looked like during the hackathon.</h2>
+          <p class="section-intro">These snapshots document assembly, coding, and submission work during the hackathon.</p>
+        </div>
+        <div class="image-slot-grid image-slot-grid--3" style="margin-top: 1.5rem;">
+          <article class="image-slot image-slot--orange reveal">
+            <span class="image-slot__badge">Assembly</span>
+            <h3>Installing the dexterous hand</h3>
+            <p>This assembly snapshot records the hardware integration work required before the robot could attempt physical sorting.</p>
+            <img class="image-slot__media image-slot__media--card image-slot__media--focus-top" src="../assets/images/安装灵巧手.jpg" alt="Team members installing the dexterous hand on the robotic arm.">
+          </article>
+          <article class="image-slot image-slot--blue reveal">
+            <span class="image-slot__badge">Coding</span>
+            <h3>Writing control code</h3>
+            <p>This coding session shows the software integration phase where perception, coordinates, and motion control were connected.</p>
+            <img class="image-slot__media image-slot__media--card" src="../assets/images/编写控制程序.jpg" alt="Team member writing control code during the build process.">
+          </article>
+          <article class="image-slot image-slot--green reveal">
+            <span class="image-slot__badge">Submission</span>
+            <h3>Pushing the work out</h3>
+            <p>This submission photo captures the final packaging step that turned the build into a reviewable hackathon submission.</p>
+            <img class="image-slot__media image-slot__media--card image-slot__media--focus-mid" src="../assets/images/将文件上传至GitHub.jpg" alt="Team member preparing and uploading project materials beside the robot setup.">
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container grid-2">
+        <article class="panel reveal">
+          <span class="card-label">Calibration setup</span>
+          <h3>Installing the calibration board</h3>
+          <p class="muted">This setup clip documents the calibration step that enabled later coordinate transformation and robot targeting.</p>
+          <div class="video-embed video-embed--portrait" style="margin-top: 1rem;">
+            <video controls muted loop playsinline>
+              <source src="../assets/videos/derived/calibration-setup-silent.mp4" type="video/mp4">
+            </video>
+          </div>
+        </article>
+        <article class="panel reveal">
+          <span class="card-label">Calibration detail</span>
+          <h3>Board placement in the workspace</h3>
+          <p class="muted">This image shows the physical reference object positioned inside the robot workspace before calibration and follow control were tested.</p>
+          <img class="image-slot__media image-slot__media--portrait" src="../assets/images/标定版安装.jpg" alt="Calibration board positioned in the robot workspace during setup.">
+        </article>
+      </div>
+    </section>
+
+    <section class="section section--dark">
+      <div class="container grid-3">
+        <article class="glass-card reveal">
+          <span class="card-label">Why it matters</span>
+          <h3>Safe progress is faster progress.</h3>
+          <p class="muted">Safe progress matters because it is one of the clearest signs of mature engineering judgment in a robotics project.</p>
+        </article>
+        <article class="glass-card reveal">
+          <span class="card-label">Engineering lessons</span>
+          <h3>Calibration, failure recovery, and tuning</h3>
+          <p class="muted">Reliability improved through repeated tuning of detections, coordinate alignment, and motion timing.</p>
+        </article>
+        <article class="glass-card reveal">
+          <span class="card-label">Documentation approach</span>
+          <h3>Short captions keep the process readable.</h3>
+          <p class="muted">The build journey is presented as milestones supported by photos and concrete results.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="brand"><span class="brand__mark">IR</span><span class="brand__text">Intelligent Robotic Sorting</span></div>
+        <p class="footer-meta">Assembly, coding, calibration, and iteration work behind the prototype.</p>
+      </div>
+      <div class="footer-links">
+        <a class="footer-link" href="../index.html">Home</a>
+        <a class="footer-link" href="system.html">System</a>
+        <a class="footer-link" href="demo.html">Demo</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      if (window.lucide) window.lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

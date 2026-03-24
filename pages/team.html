@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intelligent Robotic Sorting | Team</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <script defer src="https://unpkg.com/lucide@latest"></script>
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body data-page="team">
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="../index.html">
+        <span class="brand__mark">IR</span>
+        <span class="brand__text">Intelligent Robotic Sorting</span>
+      </a>
+      <button class="nav-toggle" data-nav-toggle aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" data-nav>
+        <a href="../index.html" data-page-link="home">Home</a>
+        <a href="system.html" data-page-link="system">System</a>
+        <a href="build.html" data-page-link="build">Build Journey</a>
+        <a href="demo.html" data-page-link="demo">Demo</a>
+        <a href="team.html" data-page-link="team">Team</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="sub-hero">
+      <div class="container">
+        <span class="eyebrow">Team and credits</span>
+        <h1 class="section-title">The people and responsibilities behind the prototype.</h1>
+        <p class="lead">The team combined robotics integration, system debugging, documentation, and demo operations to deliver the prototype.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container team-grid">
+        <article class="panel team-card person-card person-card--blue reveal">
+          <span class="team-role">Luna Zhang</span>
+          <h3 class="person-name">Luna Zhang</h3>
+          <p class="person-title">Systems integration, documentation, and demo operations</p>
+          <ul class="person-list">
+            <li>Managed project documentation and presentation materials.</li>
+            <li>Coordinated the workflow across the hackathon build.</li>
+            <li>Handled the software-hardware interface and fixed communication bugs between the computer system and the robot.</li>
+          </ul>
+        </article>
+        <article class="panel team-card person-card person-card--green reveal">
+          <span class="team-role">Tang Fuqing</span>
+          <h3 class="person-name">Tang Fuqing</h3>
+          <p class="person-title">Vision-to-robot pipeline, coordinates, and manipulator control</p>
+          <ul class="person-list">
+            <li>Integrated the YOLO11 model into the live system.</li>
+            <li>Developed the coordinate transformation pipeline from image-space to actionable robot-space positioning data.</li>
+            <li>Focused on robotic arm programming and the physical integration between the arm and the dexterous hand.</li>
+          </ul>
+        </article>
+        <article class="panel team-card reveal">
+          <span class="team-role">Advisors</span>
+          <h3>Zhen Fan and Yi Shao</h3>
+          <p class="muted">Guiding instructors who supported the project direction, system thinking, and technical development during the hackathon build.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="reveal">
+          <span class="eyebrow eyebrow--soft">Team photo</span>
+          <h2 class="section-title">The people behind the prototype.</h2>
+          <p class="section-intro">These photos show both the team working in the lab and the pair behind the final hackathon submission.</p>
+        </div>
+        <div class="image-slot-grid image-slot-grid--2" style="margin-top: 1.5rem;">
+          <article class="image-slot image-slot--pink reveal">
+            <span class="image-slot__badge">Team Collaboration</span>
+            <h3>Working through the build together</h3>
+            <p>This collaboration photo shows the team in the actual project environment, working through system integration beside the robot and laptop.</p>
+            <img class="image-slot__media image-slot__media--card" src="../assets/images/同组经验分享.jpg" alt="Team members collaborating at a laptop beside the robotics setup.">
+          </article>
+          <article class="image-slot image-slot--cyan reveal">
+            <span class="image-slot__badge">Team Portrait</span>
+            <h3>The pair behind the project</h3>
+            <p>This portrait gives the site a direct team identity beyond the robotics workspace itself.</p>
+            <img class="image-slot__media image-slot__media--card image-slot__media--focus-top" src="../assets/images/team两人合照.jpg" alt="The two project members posing together outdoors.">
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--dark">
+      <div class="container grid-2">
+        <article class="glass-card reveal">
+          <span class="card-label">What we learned</span>
+          <h3>Vision alone is not physical intelligence</h3>
+          <p class="muted">The team learned that using YOLO11 in a real robotic context demands spatial reasoning, timing, calibration, and system integration well beyond pure model training.</p>
+        </article>
+        <article class="glass-card reveal">
+          <span class="card-label">Future plans</span>
+          <h3>BinaryAttention, more categories, broader deployment</h3>
+          <p class="muted">The next stage is to integrate BinaryAttention with YOLO11, expand beyond bottles and cups, and explore more scalable deployment on constrained devices.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="brand"><span class="brand__mark">IR</span><span class="brand__text">Intelligent Robotic Sorting</span></div>
+        <p class="footer-meta">Team roles and responsibilities behind the prototype.</p>
+      </div>
+      <div class="footer-links">
+        <a class="footer-link" href="../index.html">Home</a>
+        <a class="footer-link" href="demo.html">Demo</a>
+        <a class="footer-link" href="system.html">System</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      if (window.lucide) window.lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
