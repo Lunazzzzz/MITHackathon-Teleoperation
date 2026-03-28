@@ -20,7 +20,7 @@ robot:
   enabled: true
   channel: can0
   model: nero
-  speed_percent: 20
+  speed_percent: 10
   approach_offset_m: 0.10
   retreat_offset_m: 0.12
   grasp_z_offset_m: 0.015
@@ -46,8 +46,8 @@ hand:
   hand_type: right
   open_angles_rad:
     - 0.20
-    - -0.95
-    - 0.20
+    - -1.20
+    - 0.55
     - -0.03
     - 0.35
     - 0.25
@@ -55,10 +55,22 @@ hand:
     - 0.25
     - 0.03
     - 0.20
+  release_angles_rad:
+    - 0.20
+    - -0.60
+    - 0.00
+    - -0.03
+    - 0.35
+    - 0.25
+    - 0.03
+    - 0.25
+    - 0.03
+    - 0.20
+  release_wait_s: 0.8
   close_angles_rad:
     - 0.18
-    - -1.35
-    - 0.75
+    - -1.55
+    - 0.90
     - 0.00
     - 0.75
     - 0.75

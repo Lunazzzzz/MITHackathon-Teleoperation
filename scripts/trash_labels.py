@@ -171,3 +171,14 @@ def normalize_requested_target_labels(
         seen.add(canonical)
     return normalized
 
+
+def rotate_target_labels(
+    labels: Iterable[str] | None,
+    *,
+    default: Iterable[str] | None = None,
+) -> list[str]:
+    normalized = normalize_requested_target_labels(labels, default=default)
+    if len(normalized) <= 1:
+        return normalized
+    return normalized[1:] + normalized[:1]
+

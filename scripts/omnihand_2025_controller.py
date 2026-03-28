@@ -53,8 +53,10 @@ class OmniHandController:
         self.serial_baudrate = int(cfg.get("serial_baudrate", 460800))
         self.hand_type = _resolve_hand_type(cfg.get("hand_type", "left"))
         self.open_angles = _parse_angles(cfg, "open_angles_rad")
+        self.release_angles = _parse_angles(cfg, "release_angles_rad")
         self.close_angles = _parse_angles(cfg, "close_angles_rad")
         self.open_wait_s = float(cfg.get("open_wait_s", 0.4))
+        self.release_wait_s = float(cfg.get("release_wait_s", self.open_wait_s))
         self.close_wait_s = float(cfg.get("close_wait_s", 0.5))
         self.show_data_details = bool(cfg.get("show_data_details", False))
         self.hand = None
@@ -100,6 +102,17 @@ class OmniHandController:
         if self.open_angles is None:
             raise SystemExit("OmniHand open requested but open_angles_rad is not configured.")
         self._apply_angles(self.open_angles, self.open_wait_s)
+
+    def release(self) -> None:
+        if not self.execute:
+            return
+        angles = self.release_angles if self.release_angles is not None else self.open_angles
+        wait_s = self.release_wait_s if self.release_angles is not None else self.open_wait_s
+        if angles is None:
+            raise SystemExit(
+                "OmniHand release requested but neither release_angles_rad nor open_angles_rad is configured."
+            )
+        self._apply_angles(angles, wait_s)
 
     def close(self) -> None:
         if not self.execute:

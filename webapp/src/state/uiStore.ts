@@ -7,7 +7,7 @@ export function hasRequiredTaskPoses(taskPoses: TaskPosesResponse | null) {
 
 export function hasRequiredDropPoses(dropPoses: DropPosesResponse | null) {
   const poses = dropPoses?.drop_poses ?? {};
-  return Boolean(poses.bottle && poses.cup);
+  return Boolean(poses.bottle && poses.cup && poses.drink_can);
 }
 
 export function listMissingRequirements(taskPoses: TaskPosesResponse | null, dropPoses: DropPosesResponse | null) {
@@ -19,6 +19,7 @@ export function listMissingRequirements(taskPoses: TaskPosesResponse | null, dro
   if (!tasks.standby) missing.push("缺少 Standby");
   if (!drops.bottle) missing.push("缺少 Bottle Drop");
   if (!drops.cup) missing.push("缺少 Cup Drop");
+  if (!drops.drink_can) missing.push("缺少 Drink Can Drop");
   return missing;
 }
 

@@ -45,7 +45,7 @@ export const MOCK_RUNTIME_CONFIG: RuntimeConfig = {
   base_offset_m: [0.13, 0, 0],
   pose_rpy_deg: [90.1, -3.89, -1.41],
   rotate_inference_modes: ["none", "cw90", "ccw90"],
-  target_labels: ["bottle", "cup"],
+  target_labels: ["bottle", "cup", "drink_can"],
 };
 
 export const MOCK_TASK_POSES: TaskPosesResponse = {
@@ -60,6 +60,7 @@ export const MOCK_DROP_POSES: DropPosesResponse = {
   drop_poses: {
     bottle: { xy: [-0.308629, -0.371221] },
     cup: { xy: [-0.058509, -0.34524] },
+    drink_can: { xy: [0.12, -0.08] },
   },
 };
 

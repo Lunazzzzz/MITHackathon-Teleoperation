@@ -63,11 +63,11 @@ export function DashboardPage() {
     }
   }
 
-  async function handleRecordDrop(name: "bottle" | "cup") {
-    const oldValue = dropPoses?.drop_poses[name]?.xy;
+  async function handleRecordDrop(name: "bottle" | "cup" | "drink_can") {
+    const oldValue = dropPoses?.drop_poses[name]?.pose ?? dropPoses?.drop_poses[name]?.xy;
     const confirmText = oldValue
       ? `当前 ${name} drop 已存在：\n${oldValue.join(", ")}\n\n是否覆盖？`
-      : `确认记录 ${name} drop XY？`;
+      : `确认记录 ${name} drop 位姿？`;
     if (!window.confirm(confirmText)) return;
     const response = await run(() => recordDropPose(name, true));
     if (response?.ok && response.data) {

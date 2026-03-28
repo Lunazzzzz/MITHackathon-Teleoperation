@@ -67,16 +67,18 @@ python scripts/control/run_fake_grasp_cycle.py \
   --calibration-file data/calib_run_0328am5/calibration_result.json \
   --imgsz 960 \
   --hover-height-m 0.20 \
-  --grasp-z-offset-m 0.05 \
-  --grasp-offset-m 0.15 0 0 \
-  --grasp-rpy-deg 90.10 -3.89 -1.41 \
-  --pose-rpy-deg 90.10 -3.89 -1.41 \
+  --grasp-z-offset-m 0.078 \
+  --grasp-offset-m 0.12 0 0 \
+  --grasp-rpy-deg 90.10 -30 -1.41 \
+  --pose-rpy-deg 90.10 -30 -1.41 \
   --drop-hover-z-m 0.35 \
   --drop-z-m 0.25 \
   --drop-hover-offset-m 0.10 \
   --rotate-inference-modes none cw90 ccw90 \
   --go
  ```
+
+
  10. 确认运行正常后在两个终端中分别运行 WebUI 的前后端。推荐的启动顺序是先后端，再前端。
  
  后端：
@@ -87,7 +89,7 @@ python scripts/control/run_fake_grasp_cycle.py \
  python scripts/control/web_console_api.py \
   --camera-serial 241222074755 \
   --allow-cpu \
-  --calibration-file /root/dev/MITHackathon-Teleoperation/data/calib_run_03/calibration_result.yaml \
+  --calibration-file /root/dev/MITHackathon-Teleoperation/data/calib_run_0328am5/calibration_result.yaml \
   --imgsz 960 \
   --rotate-inference-modes none cw90 ccw90 \
   --host 0.0.0.0 \

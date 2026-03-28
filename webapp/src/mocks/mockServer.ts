@@ -43,7 +43,7 @@ export async function mockRequest<T>(path: string, init?: RequestInit): Promise<
     return ok(mockTaskPoses, `Mock task pose '${name}' recorded.`) as ApiEnvelope<T>;
   }
   if (path === "/api/drop-poses/record" && method === "POST") {
-    const name = body?.name as "bottle" | "cup";
+    const name = body?.name as "bottle" | "cup" | "drink_can";
     mockDropPoses.drop_poses[name] = mockDropPoses.drop_poses[name] ?? {
       xy: [0, 0],
     };

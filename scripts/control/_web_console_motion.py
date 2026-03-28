@@ -34,7 +34,7 @@ from run_fake_grasp_cycle import (
 )
 
 TASK_POSE_NAMES = ("home", "work", "standby")
-DROP_POSE_NAMES = ("bottle", "cup")
+DROP_POSE_NAMES = ("bottle", "cup", "drink_can")
 REACHABILITY_TRANSLATION_TOL_MM = 50.0
 REACHABILITY_ROTATION_TOL_DEG = 25.0
 REACHABILITY_WAIT_SECONDS = 2.0
@@ -150,14 +150,18 @@ def serialize_drop_poses(path: Path) -> dict[str, Any]:
         entry = drop_poses.get(name)
         if not isinstance(entry, dict):
             continue
+        pose = entry.get("pose")
+        serialized_pose = None
+        if isinstance(pose, list) and len(pose) == 6:
+            serialized_pose = [float(v) for v in pose]
         xy = entry.get("xy")
         if not isinstance(xy, list) or len(xy) != 2:
-            pose = entry.get("pose")
             if isinstance(pose, list) and len(pose) >= 2:
                 xy = [float(pose[0]), float(pose[1])]
         if not isinstance(xy, list) or len(xy) != 2:
             continue
         response["drop_poses"][name] = {
+            "pose": serialized_pose,
             "xy": [float(v) for v in xy],
             "frame": entry.get("frame"),
             "updated_at": entry.get("updated_at"),

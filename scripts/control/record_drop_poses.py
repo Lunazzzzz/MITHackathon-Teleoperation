@@ -20,7 +20,7 @@ DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[2] / "config" / "drop_pos
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Record current robot XY drop/recycle positions."
+        description="Record current robot flange drop/recycle poses."
     )
     parser.add_argument("--channel", default="can0", help="SocketCAN channel, e.g. can0")
     parser.add_argument("--robot", default="nero", help="Robot name passed into pyAgxArm (default: nero)")
@@ -38,7 +38,7 @@ def parse_args() -> argparse.Namespace:
         "--frame",
         choices=["flange"],
         default="flange",
-        help="Reference frame to store. First version only supports flange XY.",
+        help="Reference frame to store. Current version stores the full flange pose plus derived XY.",
     )
     parser.add_argument(
         "--show",
@@ -85,6 +85,10 @@ def format_xy(xy: list[float]) -> str:
     return f"m={xy}\nmm={xy_mm}"
 
 
+def format_pose(pose: list[float]) -> str:
+    return f"pose(m,rad)={pose}"
+
+
 def read_flange_pose(robot: object, timeout_s: float) -> list[float] | None:
     deadline = time.time() + timeout_s
     while time.time() < deadline:
@@ -97,6 +101,10 @@ def read_flange_pose(robot: object, timeout_s: float) -> list[float] | None:
 
 def prompt_overwrite(name: str, current_entry: dict) -> bool:
     print(f"Drop position '{name}' already exists.")
+    existing_pose = current_entry.get("pose")
+    if isinstance(existing_pose, list) and len(existing_pose) == 6:
+        print("Existing pose:")
+        print(format_pose([float(v) for v in existing_pose]))
     existing_xy = current_entry.get("xy")
     if isinstance(existing_xy, list) and len(existing_xy) == 2:
         print("Existing XY:")
@@ -116,6 +124,9 @@ def print_saved_poses(path: Path, data: dict) -> None:
         if not isinstance(entry, dict):
             print(entry)
             continue
+        pose = entry.get("pose")
+        if isinstance(pose, list) and len(pose) == 6:
+            print(format_pose([float(v) for v in pose]))
         xy = entry.get("xy")
         if isinstance(xy, list) and len(xy) == 2:
             print(format_xy([float(v) for v in xy]))
@@ -152,9 +163,12 @@ def main() -> int:
     current_pose = read_flange_pose(robot, timeout_s=max(0.1, args.read_timeout))
     if current_pose is None:
         raise SystemExit("Failed to read current flange pose from the robot.")
+    current_pose = [float(v) for v in current_pose]
     current_xy = [float(current_pose[0]), float(current_pose[1])]
 
-    print(f"Current {args.frame} XY for '{pose_name}':")
+    print(f"Current {args.frame} pose for '{pose_name}':")
+    print(format_pose(current_pose))
+    print("Derived XY:")
     print(format_xy(current_xy))
 
     drop_poses = data.setdefault("drop_poses", {})
@@ -169,6 +183,7 @@ def main() -> int:
             return 0
 
     drop_poses[pose_name] = {
+        "pose": [float(v) for v in current_pose],
         "xy": [float(v) for v in current_xy],
         "frame": args.frame,
         "updated_at": datetime.now().astimezone().isoformat(timespec="seconds"),

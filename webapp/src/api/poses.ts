@@ -16,7 +16,7 @@ export function recordTaskPose(name: "home" | "work" | "standby", overwrite = fa
   });
 }
 
-export function recordDropPose(name: "bottle" | "cup", overwrite = false) {
+export function recordDropPose(name: "bottle" | "cup" | "drink_can", overwrite = false) {
   return apiRequest<DropPosesResponse>("/api/drop-poses/record", {
     method: "POST",
     body: JSON.stringify({ name, overwrite }),

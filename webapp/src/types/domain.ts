@@ -92,11 +92,12 @@ export interface TaskPosesResponse {
 }
 
 export interface DropPoseEntry {
+  pose?: [number, number, number, number, number, number];
   xy: [number, number];
   frame?: string;
   updated_at?: string;
 }
 
 export interface DropPosesResponse {
-  drop_poses: Partial<Record<"bottle" | "cup", DropPoseEntry>>;
+  drop_poses: Partial<Record<"bottle" | "cup" | "drink_can", DropPoseEntry>>;
 }

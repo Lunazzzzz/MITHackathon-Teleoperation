@@ -19,3 +19,4 @@ rotate_inference_modes:
 target_labels:
   - bottle
   - cup
+  - drink_can

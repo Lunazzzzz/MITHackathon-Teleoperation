@@ -10,5 +10,5 @@ export const DEFAULT_RUNTIME_CONFIG: RuntimeConfig = {
   base_offset_m: [0.13, 0, 0],
   pose_rpy_deg: [90.1, -3.89, -1.41],
   rotate_inference_modes: ["none", "cw90", "ccw90"],
-  target_labels: ["bottle", "cup"],
+  target_labels: ["bottle", "cup", "drink_can"],
 };

@@ -21,6 +21,7 @@ from _safety import check_pose_min_z
 from trash_labels import (
     DEFAULT_ACTIVE_TARGET_LABELS,
     normalize_requested_target_labels,
+    rotate_target_labels,
     resolve_target_name,
 )
 from ultralytics import YOLO
@@ -354,6 +355,8 @@ def act_hand(hand: OmniHandActions | None, *, action: str, execute: bool, settle
         return
     if action == "open":
         hand.open_hand()
+    elif action == "release":
+        hand.release_hand()
     elif action == "close":
         hand.close_hand()
     else:
@@ -536,7 +539,7 @@ def execute_fake_cycle(
     move_pose(robot, standby_pose, execute, "standby", args.settle_seconds, args.send_order, args.mode_resend)
     move_pose(robot, cycle_poses["drop_hover"], execute, "drop_hover", args.settle_seconds, args.send_order, args.mode_resend)
     move_pose(robot, cycle_poses["drop_down"], execute, "drop_down", args.settle_seconds, args.send_order, args.mode_resend)
-    act_hand(hand, action="open", execute=execute, settle_seconds=args.settle_seconds)
+    act_hand(hand, action="release", execute=execute, settle_seconds=args.settle_seconds)
     print("[RELEASE]")
     move_pose(robot, cycle_poses["drop_retreat"], execute, "drop_retreat", args.settle_seconds, args.send_order, args.mode_resend)
     move_pose(robot, home_pose, execute, "return_home", args.settle_seconds, args.send_order, args.mode_resend)
@@ -675,6 +678,9 @@ def main() -> int:
             print(f"camera_xyz={best['camera_xyz_m']} base_xyz={best['base_xyz_m']}")
             print(f"Using calibration: {calibration_path}")
             execute_fake_cycle(robot, hand, args, cycle_poses)
+            target_labels = rotate_target_labels(target_labels, default=DEFAULT_ACTIVE_TARGET_LABELS)
+            args.target_labels = list(target_labels)
+            print(f"Updated target priority: {', '.join(target_labels)}")
             if args.once:
                 break
     finally:

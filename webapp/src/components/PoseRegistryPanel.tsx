@@ -5,7 +5,7 @@ interface Props {
   taskPoses: TaskPosesResponse | null;
   dropPoses: DropPosesResponse | null;
   onRecordTask: (name: "home" | "work" | "standby") => void;
-  onRecordDrop: (name: "bottle" | "cup") => void;
+  onRecordDrop: (name: "bottle" | "cup" | "drink_can") => void;
 }
 
 function RegistryButton({ label, onClick }: { label: string; onClick: () => void }) {
@@ -39,10 +39,11 @@ export function PoseRegistryPanel({ taskPoses, dropPoses, onRecordTask, onRecord
         </div>
 
         <div className="rounded-2xl border border-slate-800 bg-black/20 p-4">
-          <div className="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-slate-400">Drop Centers (XY)</div>
+          <div className="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-slate-400">Drop Poses (6D)</div>
           <div className="space-y-2">
             <RegistryButton label={`Record Bottle Drop${dropPoses?.drop_poses.bottle ? " (override)" : ""}`} onClick={() => onRecordDrop("bottle")} />
             <RegistryButton label={`Record Cup Drop${dropPoses?.drop_poses.cup ? " (override)" : ""}`} onClick={() => onRecordDrop("cup")} />
+            <RegistryButton label={`Record Drink Can Drop${dropPoses?.drop_poses.drink_can ? " (override)" : ""}`} onClick={() => onRecordDrop("drink_can")} />
           </div>
         </div>
       </div>

@@ -43,6 +43,9 @@ class OmniHandActions:
     def open_hand(self) -> None:
         self.controller.open()
 
+    def release_hand(self) -> None:
+        self.controller.release()
+
     def close_hand(self) -> None:
         self.controller.close()
 
@@ -66,3 +69,7 @@ def open_hand(config: str | Path | dict[str, Any], execute: bool = True) -> None
 
 def close_hand(config: str | Path | dict[str, Any], execute: bool = True) -> None:
     create_actions(config=config, execute=execute).close_hand()
+
+
+def release_hand(config: str | Path | dict[str, Any], execute: bool = True) -> None:
+    create_actions(config=config, execute=execute).release_hand()

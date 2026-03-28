@@ -29,7 +29,12 @@ if str(VISION_DIR) not in sys.path:
 from _local_sdk import prefer_local_pyagxarm
 from _local_ultralytics import maybe_enable_binaryattention
 from omnihand_actions import create_actions
-from trash_labels import DEFAULT_ACTIVE_TARGET_LABELS, normalize_requested_target_labels, resolve_target_name
+from trash_labels import (
+    DEFAULT_ACTIVE_TARGET_LABELS,
+    normalize_requested_target_labels,
+    resolve_target_name,
+    rotate_target_labels,
+)
 from _common import (
     build_pipeline,
     default_model_path,
@@ -86,7 +91,7 @@ class RuntimeConfig:
     base_offset_m: tuple[float, float, float] = (0.13, 0.0, 0.0)
     pose_rpy_deg: tuple[float, float, float] = (90.10, -3.89, -1.41)
     rotate_inference_modes: list[str] = field(default_factory=lambda: ["none", "cw90", "ccw90"])
-    target_labels: list[str] = field(default_factory=lambda: ["bottle", "cup"])
+    target_labels: list[str] = field(default_factory=lambda: list(DEFAULT_ACTIVE_TARGET_LABELS))
 
     @classmethod
     def from_mapping(cls, data: dict[str, Any]) -> "RuntimeConfig":
@@ -418,6 +423,12 @@ class WebConsoleRuntime:
                 step_callback=self._set_step,
                 stop_event=self._stop_task_event,
             )
+            with self._lock:
+                self.runtime_config.target_labels = rotate_target_labels(
+                    self.runtime_config.target_labels,
+                    default=DEFAULT_ACTIVE_TARGET_LABELS,
+                )
+                _save_runtime_config(self.runtime_config_path, self.runtime_config)
             self.last_issue = None
             self.last_unreachable_target = None
         except WorkflowStopped:

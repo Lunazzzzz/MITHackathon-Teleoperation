@@ -19,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from _local_sdk import prefer_local_pyagxarm
 from omnihand_2025_controller import build_omnihand_controller, OmniHandController
 from _safety import check_pose_min_z
+from trash_labels import DEFAULT_ACTIVE_TARGET_LABELS, normalize_requested_target_labels, rotate_target_labels
 
 prefer_local_pyagxarm(__file__)
 
@@ -126,7 +127,11 @@ def choose_target(
     classes_cfg = config.get("classes", {})
     workflow_cfg = config.get("workflow", {})
     robot_cfg = config.get("robot", {})
-    target_labels = set(workflow_cfg.get("target_labels", []))
+    target_labels = normalize_requested_target_labels(
+        workflow_cfg.get("target_labels", DEFAULT_ACTIVE_TARGET_LABELS),
+        default=DEFAULT_ACTIVE_TARGET_LABELS,
+    )
+    priority = {label: idx for idx, label in enumerate(target_labels)}
     depth_window = int(config.get("camera", {}).get("depth_window_px", 2))
     fixed_rpy = [float(v) for v in robot_cfg.get("pose_rpy_rad", [3.141593, 0.0, 0.0])]
 
@@ -136,7 +141,7 @@ def choose_target(
 
     names = result.names
     best_plan = None
-    best_score = -1.0
+    best_key: tuple[int, float] | None = None
     for box in boxes:
         cls_idx = int(box.cls[0])
         label = str(names[cls_idx])
@@ -184,8 +189,9 @@ def choose_target(
             retreat_pose=retreat_pose,
             drop_pose=drop_pose,
         )
-        if conf > best_score:
-            best_score = conf
+        candidate_key = (priority.get(label, len(priority)), -conf)
+        if best_key is None or candidate_key < best_key:
+            best_key = candidate_key
             best_plan = plan
     return best_plan
 
@@ -259,6 +265,19 @@ def close_hand(hand: OmniHandController | None, execute: bool) -> None:
     hand.close()
 
 
+def release_hand(hand: OmniHandController | None, execute: bool) -> None:
+    if hand is None:
+        message = "OmniHand release skipped (hand disabled or --go not set)"
+        print(message)
+        time.sleep(0.1)
+        return
+    if not execute:
+        print("OmniHand release skipped (dry-run)")
+        time.sleep(0.1)
+        return
+    hand.release()
+
+
 def execute_plan(
     plan: TargetPlan,
     robot: Any,
@@ -276,7 +295,7 @@ def execute_plan(
     close_hand(hand, execute)
     move_pose(robot, plan.retreat_pose, execute, "retreat_pose")
     move_pose(robot, plan.drop_pose, execute, f"drop_pose[{plan.label}]")
-    open_hand(hand, execute)
+    release_hand(hand, execute)
     if home_pose:
         move_pose(robot, [float(v) for v in home_pose], execute, "return_home_pose")
 
@@ -355,6 +374,13 @@ def main() -> int:
     args = parse_args()
     config_path = Path(args.config).expanduser().resolve()
     config = load_yaml(config_path)
+    workflow_cfg = config.setdefault("workflow", {})
+    if not isinstance(workflow_cfg, dict):
+        raise SystemExit(f"'workflow' must be a mapping: {config_path}")
+    workflow_cfg["target_labels"] = normalize_requested_target_labels(
+        workflow_cfg.get("target_labels", DEFAULT_ACTIVE_TARGET_LABELS),
+        default=DEFAULT_ACTIVE_TARGET_LABELS,
+    )
     repo_root = Path(__file__).resolve().parents[2]
     model_path = resolve_path(str(config["model"]), config_path, repo_root)
     calibration_path = resolve_path(str(config["calibration_file"]), config_path, repo_root)
@@ -418,6 +444,11 @@ def main() -> int:
                 execute_plan(plan, robot, hand, config, args.go)
             else:
                 print("Dry run: robot motion was not executed.")
+            workflow_cfg["target_labels"] = rotate_target_labels(
+                workflow_cfg.get("target_labels", DEFAULT_ACTIVE_TARGET_LABELS),
+                default=DEFAULT_ACTIVE_TARGET_LABELS,
+            )
+            print(f"Updated target priority: {', '.join(workflow_cfg['target_labels'])}")
             executed_once = True
             if args.once:
                 break
