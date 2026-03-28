@@ -696,6 +696,12 @@ class Driver(ArmDriverAbstract):
             self._send_msg(ArmMsgReqFirmware())
 
         def is_ready() -> bool:
+            if (getattr(self._parser, "firmware_info", None) is not None
+                and len(self._parser.firmware_info.msg.data_seg) >= 3
+                and (self._parser.firmware_info.msg.data_seg[0:3] != bytearray(b'H-V')
+                     or self.get_fps() <= 0)):
+                self._parser.firmware_info.msg.clear()
+                return False
             return (
                 getattr(self._parser, "firmware_info", None) is not None
                 and len(self._parser.firmware_info.msg.data_seg) == 8 * 11
@@ -842,7 +848,10 @@ class Driver(ArmDriverAbstract):
         if percent < 0 or percent > 100:
             raise ValueError("Percent should be between 0 and 100")
         self._msg_mode.move_spd_rate_ctrl = percent
+        temp = self._msg_mode.move_mode
+        self._msg_mode.move_mode = 255
         self._set_mode()
+        self._msg_mode.move_mode = temp
 
     def set_installation_pos(
         self, pos: Literal['horizontal', 'left', 'right'] = 'horizontal'
@@ -874,8 +883,11 @@ class Driver(ArmDriverAbstract):
             )
         installation_pos = PiperDefaultDriverAPIProtoAdapter.installation_pos(pos)
         self._msg_mode.installation_pos = installation_pos
+        temp = self._msg_mode.move_mode
+        self._msg_mode.move_mode = 255
         self._set_mode()
         self._msg_mode.installation_pos = 0
+        self._msg_mode.move_mode = temp
 
     def set_motion_mode(
         self,

@@ -1,0 +1,31 @@
+:root {
+  --hud-bg: #020617;
+  --hud-panel: rgba(15, 23, 42, 0.82);
+  --hud-panel-alt: rgba(17, 28, 51, 0.78);
+  --hud-line: rgba(148, 163, 184, 0.16);
+  --hud-cyan: #06b6d4;
+  --hud-emerald: #10b981;
+  --hud-amber: #f59e0b;
+  --hud-rose: #f43f5e;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(6, 182, 212, 0.08), transparent 28%),
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 30%),
+    linear-gradient(180deg, #020617 0%, #06101f 100%);
+}
+
+.hud-panel {
+  background: var(--hud-panel);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--hud-line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 24px 48px rgba(0, 0, 0, 0.25);
+}
+
+.hud-grid {
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+}

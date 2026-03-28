@@ -39,7 +39,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--method",
-        default="andreff",
+        default="park",
         choices=["tsai", "park", "horaud", "andreff", "daniilidis"],
         help="OpenCV hand-eye solver",
     )

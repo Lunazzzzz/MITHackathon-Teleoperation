@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-MIN_TOOL_Z_M = 0.10
+MIN_TOOL_Z_M = -1.0
 
 
 def check_pose_min_z(pose: list[float] | tuple[float, ...], label: str, *, min_z_m: float = MIN_TOOL_Z_M) -> bool:

@@ -635,7 +635,10 @@ class Driver(ArmDriverAbstract):
         if percent < 0 or percent > 100:
             raise ValueError("Percent should be between 0 and 100")
         self._msg_mode.move_spd_rate_ctrl = percent
+        temp = self._msg_mode.move_mode
+        self._msg_mode.move_mode = 255
         self._set_mode()
+        self._msg_mode.move_mode = temp
 
     def set_motion_mode(
         self,
@@ -1036,21 +1039,30 @@ class Driver(ArmDriverAbstract):
         """Set the robotic arm to the normal controlled mode (single arm)."""
         self._set_leader_follower_config(linkage_config=0x00)
         self._msg_mode.enable_can_push = 0x01
+        temp = self._msg_mode.move_mode
+        self._msg_mode.move_mode = 255
         self._set_mode()
         self._msg_mode.enable_can_push = 0x00
+        self._msg_mode.move_mode = temp
 
     def set_leader_mode(self):
         """Set the arm to the leader arm zero force drag mode (leader arm)."""
         self._msg_mode.enable_can_push = 0x02
+        temp = self._msg_mode.move_mode
+        self._msg_mode.move_mode = 255
         self._set_mode()
         self._msg_mode.enable_can_push = 0x00
+        self._msg_mode.move_mode = temp
         self._set_leader_follower_config(linkage_config=0xFA)
 
     def set_follower_mode(self):
         """Set the arm to the follower arm controlled mode (follower arm)."""
         self._msg_mode.enable_can_push = 0x02
+        temp = self._msg_mode.move_mode
+        self._msg_mode.move_mode = 255
         self._set_mode()
         self._msg_mode.enable_can_push = 0x00
+        self._msg_mode.move_mode = temp
         self._set_leader_follower_config(linkage_config=0xFC)
 
     def get_leader_joint_angles(self):

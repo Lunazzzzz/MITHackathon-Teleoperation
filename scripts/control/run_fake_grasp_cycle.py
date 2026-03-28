@@ -12,11 +12,18 @@ from typing import Any
 import cv2
 import numpy as np
 import yaml
-from ultralytics import YOLO
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from _local_ultralytics import maybe_enable_binaryattention
 from _local_sdk import prefer_local_pyagxarm
+from omnihand_actions import OmniHandActions, create_actions
 from _safety import check_pose_min_z
+from trash_labels import (
+    DEFAULT_ACTIVE_TARGET_LABELS,
+    normalize_requested_target_labels,
+    resolve_target_name,
+)
+from ultralytics import YOLO
 
 prefer_local_pyagxarm(__file__)
 
@@ -25,10 +32,12 @@ if str(VISION_DIR) not in sys.path:
     sys.path.insert(0, str(VISION_DIR))
 
 from _common import (  # type: ignore[no-redef]
+    DetectionStabilizer,
     build_pipeline,
     default_model_path,
-    detection_rows,
     intrinsics_from_profile,
+    normalize_rotate_inference_modes,
+    predict_detection_rows_multirotation,
     put_lines,
     resolve_device,
     resolve_path,
@@ -38,17 +47,14 @@ from _common import (  # type: ignore[no-redef]
 import pyrealsense2 as rs
 
 
-CLASS_ALIASES = {
-    "cell phone": "bottle",
-}
-DEFAULT_TARGET_LABELS = ["bottle", "cup"]
 DEFAULT_TASK_POSES_PATH = Path(__file__).resolve().parents[2] / "config" / "task_poses.yaml"
 DEFAULT_DROP_POSES_PATH = Path(__file__).resolve().parents[2] / "config" / "drop_poses.yaml"
+DEFAULT_HAND_CONFIG_PATH = Path(__file__).resolve().parents[2] / "config" / "sort_trash_pipeline.example.yaml"
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run a fake full pick/place cycle without a hand: home -> work -> target -> standby -> drop -> home."
+        description="Run a full pick/place cycle with recorded drop poses: home -> work -> target -> standby -> drop -> home."
     )
     parser.add_argument("--model", default=str(default_model_path()), help="Ultralytics model path or name")
     parser.add_argument("--device", default="0", help="Inference device. Use 0 for the first CUDA GPU.")
@@ -58,11 +64,72 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--width", type=int, default=1280)
     parser.add_argument("--height", type=int, default=720)
     parser.add_argument("--fps", type=int, default=30)
+    parser.add_argument(
+        "--rotate-inference",
+        choices=["none", "cw90", "ccw90", "180"],
+        default="none",
+        help="Single rotate mode for YOLO inference. Use --rotate-inference-modes for dual/triple-route inference.",
+    )
+    parser.add_argument(
+        "--rotate-inference-modes",
+        nargs="*",
+        choices=["none", "cw90", "ccw90", "180"],
+        default=None,
+        help="Optional multiple rotate modes, e.g. none cw90 ccw90.",
+    )
+    parser.add_argument("--imgsz", type=int, default=960, help="YOLO inference size in pixels")
     parser.add_argument("--depth-window", type=int, default=2, help="Pixel radius for depth fallback sampling")
+    parser.add_argument(
+        "--stable-window-frames",
+        type=int,
+        default=5,
+        help="Number of recent frames used for detection stabilization.",
+    )
+    parser.add_argument(
+        "--stable-min-hits",
+        type=int,
+        default=3,
+        help="How many matching detections are required inside the stabilization window.",
+    )
+    parser.add_argument(
+        "--stable-max-center-dist-px",
+        type=float,
+        default=80.0,
+        help="Maximum pixel drift allowed when matching detections across frames.",
+    )
+    parser.add_argument(
+        "--keep-last-seconds",
+        type=float,
+        default=0.5,
+        help="Keep the last stable target for this many seconds when detections flicker.",
+    )
     parser.add_argument("--calibration-file", required=True, help="calibration_result.yaml with T_base_camera")
     parser.add_argument("--task-poses-file", default=str(DEFAULT_TASK_POSES_PATH), help="YAML file with home/work/standby poses")
-    parser.add_argument("--drop-poses-file", default=str(DEFAULT_DROP_POSES_PATH), help="YAML file with per-class drop XY")
-    parser.add_argument("--target-labels", nargs="*", default=DEFAULT_TARGET_LABELS, help="Semantic target labels to keep")
+    parser.add_argument(
+        "--drop-poses-file",
+        default=str(DEFAULT_DROP_POSES_PATH),
+        help="YAML file with per-class drop poses; recorded pose[6] is preferred, xy remains supported as fallback.",
+    )
+    parser.add_argument("--hand-config", default=str(DEFAULT_HAND_CONFIG_PATH), help="YAML file with OmniHand hand config")
+    parser.add_argument(
+        "--enable-auto-exposure",
+        action="store_true",
+        help="Keep RealSense color auto exposure enabled instead of locking manual settings.",
+    )
+    parser.add_argument("--exposure", type=float, default=156.0, help="Manual RealSense color exposure when auto exposure is disabled.")
+    parser.add_argument("--gain", type=float, default=64.0, help="Manual RealSense color gain when auto exposure is disabled.")
+    parser.add_argument(
+        "--enable-auto-white-balance",
+        action="store_true",
+        help="Keep RealSense auto white balance enabled instead of locking a manual value.",
+    )
+    parser.add_argument("--white-balance", type=float, default=4600.0, help="Manual RealSense white balance when auto white balance is disabled.")
+    parser.add_argument(
+        "--target-labels",
+        nargs="*",
+        default=DEFAULT_ACTIVE_TARGET_LABELS,
+        help="Semantic target labels to keep after raw model outputs are mapped into unified trash labels.",
+    )
     parser.add_argument("--channel", default="can0", help="SocketCAN channel")
     parser.add_argument("--robot", default="nero", help="Robot model for pyAgxArm")
     parser.add_argument("--speed-percent", type=int, default=10, help="Robot speed percent")
@@ -75,15 +142,39 @@ def parse_args() -> argparse.Namespace:
         default=0.18,
         help="Offset added to target base z for the fake pre-grasp pose; on the current setup, the default 0.18 targets about 10 cm above the object.",
     )
-    parser.add_argument("--drop-hover-z-m", type=float, default=0.25, help="Fixed hover z above the drop box")
-    parser.add_argument("--drop-z-m", type=float, default=0.15, help="Fixed down/release z over the drop box")
+    parser.add_argument(
+        "--drop-hover-offset-m",
+        type=float,
+        default=0.10,
+        help="Extra z clearance above the recorded drop pose before descending to release.",
+    )
+    parser.add_argument(
+        "--drop-hover-z-m",
+        type=float,
+        default=0.25,
+        help="Fallback hover z used only when the drop pose file contains XY but not a full recorded pose.",
+    )
+    parser.add_argument(
+        "--drop-z-m",
+        type=float,
+        default=0.15,
+        help="Fallback release z used only when the drop pose file contains XY but not a full recorded pose.",
+    )
     parser.add_argument(
         "--base-offset-m",
         nargs=3,
         type=float,
         default=[0.0, -0.05, 0.0],
         metavar=("DX", "DY", "DZ"),
-        help="Empirical base-frame XYZ correction applied to target hover/pregrasp poses. Current default adds -5 cm on Y.",
+        help="Fallback compatibility offset for older workflows; prefer --grasp-offset-m for grasp approach tuning.",
+    )
+    parser.add_argument(
+        "--grasp-offset-m",
+        nargs=3,
+        type=float,
+        default=[0.10, -0.05, 0.0],
+        metavar=("DX", "DY", "DZ"),
+        help="Base-frame XYZ correction applied to target hover/pregrasp poses. Default adds +10 cm on X and -5 cm on Y.",
     )
     parser.add_argument(
         "--pose-rpy-deg",
@@ -91,7 +182,15 @@ def parse_args() -> argparse.Namespace:
         type=float,
         default=[90.0, -90.0, 0.0],
         metavar=("ROLL", "PITCH", "YAW"),
-        help="Fixed flange orientation used for the fake pick/place cycle.",
+        help="Fallback flange orientation used when the drop pose file contains XY but not a full recorded pose.",
+    )
+    parser.add_argument(
+        "--grasp-rpy-deg",
+        nargs=3,
+        type=float,
+        default=[90.0, -20.0, 0.0],
+        metavar=("ROLL", "PITCH", "YAW"),
+        help="Flange orientation used for target_hover/pregrasp poses. Default is RX=90°, RY=-20°, RZ=0°.",
     )
     parser.add_argument("--settle-seconds", type=float, default=1.0, help="Wait time after each move.")
     parser.add_argument("--once", action="store_true", help="Exit after one cycle or one dry-run preview.")
@@ -137,18 +236,29 @@ def load_task_pose(path_str: str, name: str) -> list[float]:
     return [float(v) for v in pose]
 
 
-def load_drop_xy(path_str: str, label: str) -> list[float]:
+def load_drop_target(path_str: str, label: str) -> dict[str, list[float] | None]:
     path, data = load_yaml(path_str)
     drop_poses = data.get("drop_poses", {})
     if not isinstance(drop_poses, dict):
         raise SystemExit(f"'drop_poses' must be a mapping: {path}")
     entry = drop_poses.get(label)
-    if not isinstance(entry, dict) or "xy" not in entry:
-        raise SystemExit(f"Drop XY for '{label}' is missing in {path}")
-    xy = entry["xy"]
-    if not isinstance(xy, list) or len(xy) != 2:
-        raise SystemExit(f"Drop XY for '{label}' must be a 2-element list in {path}")
-    return [float(v) for v in xy]
+    if not isinstance(entry, dict):
+        raise SystemExit(f"Drop pose for '{label}' is missing in {path}")
+
+    pose = entry.get("pose")
+    xy = entry.get("xy")
+    parsed_pose = None
+    parsed_xy = None
+    if isinstance(pose, list) and len(pose) == 6:
+        parsed_pose = [float(v) for v in pose]
+    if isinstance(xy, list) and len(xy) == 2:
+        parsed_xy = [float(v) for v in xy]
+    elif parsed_pose is not None:
+        parsed_xy = [float(parsed_pose[0]), float(parsed_pose[1])]
+
+    if parsed_pose is None and parsed_xy is None:
+        raise SystemExit(f"Drop pose for '{label}' must contain either pose[6] or xy[2] in {path}")
+    return {"pose": parsed_pose, "xy": parsed_xy}
 
 
 def build_robot(channel: str, robot_name: str):
@@ -238,6 +348,20 @@ def move_pose(robot: object | None, pose: list[float], execute: bool, label: str
         time.sleep(max(0.0, settle_seconds))
 
 
+def act_hand(hand: OmniHandActions | None, *, action: str, execute: bool, settle_seconds: float) -> None:
+    print(f"{action}_hand")
+    if hand is None:
+        return
+    if action == "open":
+        hand.open_hand()
+    elif action == "close":
+        hand.close_hand()
+    else:
+        raise ValueError(f"Unsupported hand action: {action}")
+    if execute:
+        time.sleep(max(0.0, settle_seconds))
+
+
 def choose_target(
     raw_rows: list[dict[str, object]],
     depth_frame: rs.depth_frame,
@@ -251,9 +375,11 @@ def choose_target(
     rows: list[dict[str, object]] = []
     for row in raw_rows:
         original_name = str(row["class_name"])
-        target_name = CLASS_ALIASES.get(original_name, original_name)
+        target_name = resolve_target_name(original_name)
         row["target_name"] = target_name
-        if target_name not in priority:
+        if target_name is None:
+            continue
+        if priority and target_name not in priority:
             continue
         cx, cy = [int(v) for v in row["center_xy"]]
         depth_m = sample_depth_m(depth_frame, cx, cy, depth_window)
@@ -275,37 +401,61 @@ def choose_target(
     return rows[0] if rows else None
 
 
+def format_target_label(row: dict[str, object] | None) -> str:
+    if row is None:
+        return "unknown"
+    label_text = str(row["class_name"])
+    if row.get("target_name") and row["target_name"] != row["class_name"]:
+        label_text = f"{row['class_name']}->{row['target_name']}"
+    return label_text
+
+
 def build_cycle_poses(best: dict[str, object], args: argparse.Namespace) -> dict[str, list[float]]:
     base = [float(v) for v in best["base_xyz_m"]]
-    base_offset = [float(v) for v in args.base_offset_m]
-    rpy = [float(np.deg2rad(v)) for v in args.pose_rpy_deg]
+    grasp_offset = [float(v) for v in args.grasp_offset_m]
+    grasp_rpy = [float(np.deg2rad(v)) for v in args.grasp_rpy_deg]
+    drop_fallback_rpy = [float(np.deg2rad(v)) for v in args.pose_rpy_deg]
     label = str(best.get("target_name", best["class_name"]))
-    drop_xy = load_drop_xy(args.drop_poses_file, label)
+    drop_target = load_drop_target(args.drop_poses_file, label)
+    drop_pose = drop_target["pose"]
+    drop_xy = drop_target["xy"]
+    assert drop_xy is not None
 
     target_hover = [
-        base[0] + base_offset[0],
-        base[1] + base_offset[1],
-        base[2] + base_offset[2] + args.hover_height_m,
-        *rpy,
+        base[0] + grasp_offset[0],
+        base[1] + grasp_offset[1],
+        base[2] + grasp_offset[2] + args.hover_height_m,
+        *grasp_rpy,
     ]
     pregrasp_10cm = [
-        base[0] + base_offset[0],
-        base[1] + base_offset[1],
-        base[2] + base_offset[2] + args.grasp_z_offset_m,
-        *rpy,
+        base[0] + grasp_offset[0],
+        base[1] + grasp_offset[1],
+        base[2] + grasp_offset[2] + args.grasp_z_offset_m,
+        *grasp_rpy,
     ]
-    drop_hover = [
-        drop_xy[0],
-        drop_xy[1],
-        args.drop_hover_z_m,
-        *rpy,
-    ]
-    drop_down = [
-        drop_xy[0],
-        drop_xy[1],
-        args.drop_z_m,
-        *rpy,
-    ]
+    if drop_pose is not None:
+        drop_down = list(drop_pose)
+        drop_hover = [
+            drop_pose[0],
+            drop_pose[1],
+            drop_pose[2] + args.drop_hover_offset_m,
+            drop_pose[3],
+            drop_pose[4],
+            drop_pose[5],
+        ]
+    else:
+        drop_hover = [
+            drop_xy[0],
+            drop_xy[1],
+            args.drop_hover_z_m,
+            *drop_fallback_rpy,
+        ]
+        drop_down = [
+            drop_xy[0],
+            drop_xy[1],
+            args.drop_z_m,
+            *drop_fallback_rpy,
+        ]
     return {
         "target_hover": target_hover,
         "pregrasp_10cm": pregrasp_10cm,
@@ -320,18 +470,26 @@ def annotate_frame(image: np.ndarray, best: dict[str, object] | None, cycle_pose
     frame = image.copy()
     lines = [
         f"mode={'go' if args.go else 'dry-run'}",
-        f"drop_z={args.drop_z_m:.3f}m hover_h={args.hover_height_m:.3f}m",
+        f"rotate={args.rotate_inference_label} imgsz={args.imgsz} hover_h={args.hover_height_m:.3f}m drop_hover_offset={args.drop_hover_offset_m:.3f}m",
         "Press g to run one fake cycle, q to quit",
     ]
     if best is not None:
         x1, y1, x2, y2 = [int(v) for v in best["bbox_xyxy"]]
         cx, cy = [int(v) for v in best["center_xy"]]
-        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 220, 0), 2)
-        cv2.circle(frame, (cx, cy), 5, (0, 220, 0), -1)
+        stale = bool(best.get("stale"))
+        unstable = bool(best.get("unstable"))
+        color = (120, 200, 200) if stale else ((0, 220, 255) if unstable else (0, 220, 0))
+        cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+        cv2.circle(frame, (cx, cy), 5, color, -1)
         label_text = str(best["class_name"])
         if best.get("target_name") and best["target_name"] != best["class_name"]:
             label_text = f"{best['class_name']}->{best['target_name']}"
-        lines.append(f"target={label_text} conf={float(best['confidence']):.2f}")
+        status = "stable"
+        if stale:
+            status = "last-known"
+        elif unstable:
+            status = f"stabilizing {int(best.get('stable_hits', 0))}/{args.stable_min_hits}"
+        lines.append(f"target={label_text} conf={float(best['confidence']):.2f} status={status}")
         lines.append(
             f"base=({best['base_xyz_m'][0]:.3f}, {best['base_xyz_m'][1]:.3f}, {best['base_xyz_m'][2]:.3f})"
         )
@@ -348,7 +506,12 @@ def annotate_frame(image: np.ndarray, best: dict[str, object] | None, cycle_pose
     return put_lines(frame, lines)
 
 
-def execute_fake_cycle(robot: object | None, args: argparse.Namespace, cycle_poses: dict[str, list[float]]) -> None:
+def execute_fake_cycle(
+    robot: object | None,
+    hand: OmniHandActions | None,
+    args: argparse.Namespace,
+    cycle_poses: dict[str, list[float]],
+) -> None:
     home_pose = load_task_pose(args.task_poses_file, "home")
     work_pose = load_task_pose(args.task_poses_file, "work")
     standby_pose = load_task_pose(args.task_poses_file, "standby")
@@ -356,6 +519,7 @@ def execute_fake_cycle(robot: object | None, args: argparse.Namespace, cycle_pos
     execute = bool(args.go and robot is not None)
     move_pose(robot, home_pose, execute, "home", args.settle_seconds, args.send_order, args.mode_resend)
     move_pose(robot, work_pose, execute, "work", args.settle_seconds, args.send_order, args.mode_resend)
+    act_hand(hand, action="open", execute=execute, settle_seconds=args.settle_seconds)
     move_pose(robot, cycle_poses["target_hover"], execute, "target_hover", args.settle_seconds, args.send_order, args.mode_resend)
     move_pose(
         robot,
@@ -366,44 +530,48 @@ def execute_fake_cycle(robot: object | None, args: argparse.Namespace, cycle_pos
         args.send_order,
         args.mode_resend,
     )
-    print("[FAKE GRASP]")
+    act_hand(hand, action="close", execute=execute, settle_seconds=args.settle_seconds)
+    print("[GRASP]")
     move_pose(robot, cycle_poses["target_retreat"], execute, "target_retreat", args.settle_seconds, args.send_order, args.mode_resend)
     move_pose(robot, standby_pose, execute, "standby", args.settle_seconds, args.send_order, args.mode_resend)
     move_pose(robot, cycle_poses["drop_hover"], execute, "drop_hover", args.settle_seconds, args.send_order, args.mode_resend)
     move_pose(robot, cycle_poses["drop_down"], execute, "drop_down", args.settle_seconds, args.send_order, args.mode_resend)
-    print("[FAKE RELEASE]")
+    act_hand(hand, action="open", execute=execute, settle_seconds=args.settle_seconds)
+    print("[RELEASE]")
     move_pose(robot, cycle_poses["drop_retreat"], execute, "drop_retreat", args.settle_seconds, args.send_order, args.mode_resend)
     move_pose(robot, home_pose, execute, "return_home", args.settle_seconds, args.send_order, args.mode_resend)
 
 
 def main() -> int:
     args = parse_args()
+    rotate_modes = normalize_rotate_inference_modes(args.rotate_inference, args.rotate_inference_modes)
+    args.rotate_inference_label = "+".join(rotate_modes)
     model_path = resolve_path(args.model)
     if not model_path.exists():
         raise SystemExit(f"Model file does not exist: {model_path}")
+
+    try:
+        target_labels = normalize_requested_target_labels(
+            args.target_labels,
+            default=DEFAULT_ACTIVE_TARGET_LABELS,
+        )
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
+    args.target_labels = target_labels
 
     calibration_path, base_to_camera = load_base_to_camera(args.calibration_file)
     _ = load_task_pose(args.task_poses_file, "home")
     _ = load_task_pose(args.task_poses_file, "work")
     _ = load_task_pose(args.task_poses_file, "standby")
-    for label in args.target_labels:
-        _ = load_drop_xy(args.drop_poses_file, label)
+    for label in target_labels:
+        _ = load_drop_target(args.drop_poses_file, label)
 
     device = resolve_device(args.device, args.allow_cpu)
+    maybe_enable_binaryattention(__file__, model_path, verbose=True)
     model = YOLO(str(model_path))
-    pipeline, align, profile = build_pipeline(
-        camera_serial=args.camera_serial,
-        width=args.width,
-        height=args.height,
-        fps=args.fps,
-        enable_depth=True,
-    )
-    assert align is not None
-    intrinsics = intrinsics_from_profile(profile)
-    output_path = Path(args.save_json).expanduser().resolve() if args.save_json else None
-    output_handle = output_path.open("a", encoding="utf-8") if output_path else None
 
     robot = None
+    hand = create_actions(args.hand_config, execute=args.go)
     home_pose = load_task_pose(args.task_poses_file, "home")
     if args.go:
         robot = build_robot(args.channel, args.robot)
@@ -414,6 +582,29 @@ def main() -> int:
         else:
             print("Robot is not at home pose; moving to home before detection.")
             move_pose(robot, home_pose, True, "startup_home", args.settle_seconds, args.send_order, args.mode_resend)
+
+    pipeline, align, profile = build_pipeline(
+        camera_serial=args.camera_serial,
+        width=args.width,
+        height=args.height,
+        fps=args.fps,
+        enable_depth=True,
+        color_auto_exposure=args.enable_auto_exposure,
+        color_exposure=args.exposure,
+        color_gain=args.gain,
+        color_auto_white_balance=args.enable_auto_white_balance,
+        color_white_balance=args.white_balance,
+    )
+    assert align is not None
+    intrinsics = intrinsics_from_profile(profile)
+    stabilizer = DetectionStabilizer(
+        window_frames=args.stable_window_frames,
+        min_hits=args.stable_min_hits,
+        max_center_distance_px=args.stable_max_center_dist_px,
+        hold_seconds=args.keep_last_seconds,
+    )
+    output_path = Path(args.save_json).expanduser().resolve() if args.save_json else None
+    output_handle = output_path.open("a", encoding="utf-8") if output_path else None
 
     window_name = "run_fake_grasp_cycle"
     try:
@@ -426,23 +617,30 @@ def main() -> int:
                 continue
 
             image = np.asanyarray(color_frame.get_data())
-            results = model.predict(
-                source=image,
+            raw_rows = predict_detection_rows_multirotation(
+                model,
+                image,
+                rotate_modes=rotate_modes,
                 device=device,
                 conf=args.conf,
-                verbose=False,
-                stream=False,
+                imgsz=args.imgsz,
             )
-            raw_rows = detection_rows(results[0])
-            best = choose_target(
+            current_best = choose_target(
                 raw_rows,
                 depth_frame,
                 intrinsics,
                 base_to_camera,
-                target_labels=list(args.target_labels),
+                target_labels=target_labels,
                 depth_window=args.depth_window,
             )
-            cycle_poses = build_cycle_poses(best, args) if best is not None else None
+            best = stabilizer.update([current_best] if current_best is not None else [], now=time.time())
+            can_execute_target = (
+                best is not None
+                and not bool(best.get("unstable"))
+                and not bool(best.get("stale"))
+                and best.get("base_xyz_m") is not None
+            )
+            cycle_poses = build_cycle_poses(best, args) if can_execute_target else None
 
             annotated = annotate_frame(image, best, cycle_poses, args)
             cv2.imshow(window_name, annotated)
@@ -464,16 +662,19 @@ def main() -> int:
             if key != ord("g"):
                 continue
             if best is None or cycle_poses is None:
-                print("No valid target; fake cycle skipped.")
+                if best is not None and bool(best.get("unstable")):
+                    print(
+                        f"Target is still stabilizing ({int(best.get('stable_hits', 0))}/{args.stable_min_hits}); fake cycle skipped."
+                    )
+                else:
+                    print("No stable valid target; fake cycle skipped.")
                 continue
 
-            label_text = str(best["class_name"])
-            if best.get("target_name") and best["target_name"] != best["class_name"]:
-                label_text = f"{best['class_name']}->{best['target_name']}"
+            label_text = format_target_label(best)
             print(f"Selected target: {label_text} conf={float(best['confidence']):.3f}")
             print(f"camera_xyz={best['camera_xyz_m']} base_xyz={best['base_xyz_m']}")
             print(f"Using calibration: {calibration_path}")
-            execute_fake_cycle(robot, args, cycle_poses)
+            execute_fake_cycle(robot, hand, args, cycle_poses)
             if args.once:
                 break
     finally:
