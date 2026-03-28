@@ -1112,6 +1112,14 @@ video {
   object-position: center 46%;
 }
 
+.image-slot__media--focus-lower {
+  object-position: center 34%;
+}
+
+.image-slot__media--focus-left {
+  object-position: 36% top;
+}
+
 .image-slot__video {
   aspect-ratio: 16 / 9;
   object-fit: cover;
